@@ -57,7 +57,7 @@ sub _load_credentials {
 }
 
 sub _config_paths {
-    ( $ENV{HOME} . '/.dbic', './dbic', '/etc/dbic' );
+    ( './dbic', $ENV{HOME} . '/.dbic', '/etc/dbic' );
 }
 
 1;
