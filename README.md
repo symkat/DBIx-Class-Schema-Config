@@ -28,15 +28,18 @@ DBIx::Class::Schema::Credentials - Manage connection credentials for DBIx::Class
 
 # DESCRIPTION
 
-DBIx::Class::Schema::Credentials is a subclass of DBIx::Class::Schema that allows the loading of credentials from a file.  The actual code itself would only need to know about the name of the database, this aims to make it simpler for operations teams to manage database credentials.
+DBIx::Class::Schema::Credentials is a subclass of DBIx::Class::Schema 
+that allows the loading of credentials from a file.  The actual code 
+itself would only need to know about the name of the database, this 
+aims to make it simpler for operations teams to manage database credentials.
 
 # CONFIG FILES
 
 This module will load the files in the following order if they exist:
 
-    ./dbic.*
-    ~/.dbic.*
-    /etc/dbic.*
+* ./dbic.*
+* ~/.dbic.*
+* /etc/dbic.*
 
 The files should have an extension that Config::Any recognizes, for example /etc/dbic.__yaml__.
 
@@ -54,14 +57,16 @@ Override this function to change the configuration paths that are searched, for 
     use base 'DBIx::Class::Schema::Credentials';
     
 
-    # Override _config_paths to search /var/config/dbic.* and /etc/myproject/project.*
+    # Override _config_paths to search 
+    # /var/config/dbic.* and /etc/myproject/project.*
     sub _config_paths {
         ( '/var/config/dbic', '/etc/myproject/project' );
     }
 
 ## _load_credentials
 
-Override this function to change the way that DBIx::Class::Schema::Credentials loads credentials, the functions takes the class name, as well as a hashref.
+Override this function to change the way that DBIx::Class::Schema::Credentials 
+loads credentials, the functions takes the class name, as well as a hashref.
 
     Some::Schema->connect( "dbi:Pg:dbname=blog", "user", "password", { TraceLevel => 1 } )
 
@@ -76,7 +81,9 @@ Would result in the following data structure as $config in `_load_credentials($c
         },
     }
 
-It if the responsibility of this function to allow passing through of normal ->connect calls, this is done by returning the current configuration is the dsn matches ^dbi:.
+It if the responsibility of this function to allow passing through of normal 
+`->connect` calls, this is done by returning the current configuration if the 
+dsn matches ^dbi:.
 
 The function should return the same structure.  For instance:
 
@@ -86,17 +93,17 @@ The function should return the same structure.  For instance:
     use base 'DBIx::Class::Schema::Credentials';
     use LWP::Simple;
     use JSON
-    
+
 
     # Load credentials from internal web server.
     sub _load_credentials {
         my ( $class, $config ) = @_;
-        
 
         return $config if $config->{dsn} =~ /^dbi:/i;
 
-       return decode_json( 
-           get( "http://someserver.com/v1.0/database?key=somesecret&db=" . $config->{dsn}  ));
+        return decode_json( 
+            get( "http://someserver.com/v1.0/database?key=somesecret&db=" . 
+                $config->{dsn}  ));
     }
 
 # AUTHOR
