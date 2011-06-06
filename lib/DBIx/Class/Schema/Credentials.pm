@@ -43,9 +43,9 @@ sub _load_credentials {
 
     return $config if $config->{dsn} =~ /^dbi:/i;
 
+    # TODO This block is ugly, make it prettier.
     my $ConfigAny = Config::Any->load_stems( { stems => [$class->_config_paths], use_ext => 1 } );
 
-    # TODO Optimize This Code.
     for my $cfile ( @$ConfigAny ) {
         my ($filename) = keys %$cfile;
         for my $database ( keys %{$cfile->{$filename}} ) {
@@ -57,7 +57,7 @@ sub _load_credentials {
 }
 
 sub _config_paths {
-    ( './dbic', '/etc/dbic' );
+    ( $ENV{HOME} . '/.dbic', './dbic', '/etc/dbic' );
 }
 
 1;
