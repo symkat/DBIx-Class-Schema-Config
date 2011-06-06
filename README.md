@@ -1,6 +1,6 @@
 # NAME
 
-DBIx::Class::Schema::Credentials - Manage connection credentials for DBIx::Class::Schema
+DBIx::Class::Schema::Config - Manage connection credentials for DBIx::Class::Schema in a file.
 
 # SYNOPSIS
 
@@ -16,7 +16,7 @@ DBIx::Class::Schema::Credentials - Manage connection credentials for DBIx::Class
     use warnings;
     use strict;
 
-    use base 'DBIx::Class::Schema::Credentials';
+    use base 'DBIx::Class::Schema::Config';
     __PACKAGE__->load_namespaces;
 
     package My::Code;
@@ -28,7 +28,7 @@ DBIx::Class::Schema::Credentials - Manage connection credentials for DBIx::Class
 
 # DESCRIPTION
 
-DBIx::Class::Schema::Credentials is a subclass of DBIx::Class::Schema 
+DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema 
 that allows the loading of credentials from a file.  The actual code 
 itself would only need to know about the name of the database, this 
 aims to make it simpler for operations teams to manage database credentials.
@@ -121,4 +121,4 @@ LICENSE file included in this package for more detailed information.
 # AVAILABILITY
 
 The latest version of this software is available through GitHub at
-https://github.com/symkat/DBIx-Class-Schema-Credentials
+https://github.com/symkat/DBIx-Class-Schema-Config
