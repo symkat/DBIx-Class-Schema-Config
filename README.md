@@ -4,27 +4,27 @@ DBIx::Class::Schema::Credentials - Manage connection credentials for DBIx::Class
 
 # SYNOPSIS
 
-  /etc/dbic.yaml
-  MY_DATABASE:
-    dsn: "rbi:Pg:host=localhost;database=blog"
-    user: "TheDoctor"
-    password: "dnoPydoleM"
-      options:
-        TraceLevel: 1
+    /etc/dbic.yaml
+    MY_DATABASE:
+        dsn: "rbi:Pg:host=localhost;database=blog"
+        user: "TheDoctor"
+        password: "dnoPydoleM"
+        options:
+            TraceLevel: 1
 
-  package My::Schema
-  use warnings;
-  use strict;
-   
-  use base 'DBIx::Class::Schema::Credentials';
-  __PACKAGE__->load_namespaces;
+    package My::Schema
+    use warnings;
+    use strict;
 
-  package My::Code;
-  use warnings;
-  use strict;
-  use My::Schema;
+    use base 'DBIx::Class::Schema::Credentials';
+    __PACKAGE__->load_namespaces;
 
-  my $schema = My::Schema->connect('MY_DATABASE');
+    package My::Code;
+    use warnings;
+    use strict;
+    use My::Schema;
+
+    my $schema = My::Schema->connect('MY_DATABASE');
 
 # DESCRIPTION
 
