@@ -43,8 +43,10 @@ This module will load the files in the following order if they exist:
 
 The files should have an extension that Config::Any recognizes, for example /etc/dbic.__yaml__.
 
-NOTE:  The first acceptable configuration loaded will be used.  As such, DATABASE in ./dbic.yaml
-would be used before DATABASE in /etc/dbic.yaml.
+NOTE:  The first available credential will be used.  Therefore DATABASE in ~/.dbic.yaml 
+will only be looked at if it was not found in ./dbic.yaml.  If there are duplicates in
+one file (such that DATABASE is listed twice in ~/.dbic.yaml) the first configuration 
+will be used.
 
 # OVERRIDING
 
@@ -70,6 +72,9 @@ Override this function to change the configuration paths that are searched, for 
 
 Override this function to change the way that DBIx::Class::Schema::Credentials 
 loads credentials, the functions takes the class name, as well as a hashref.
+
+If you take the route of having `->connect('DATABASE')` used as a key for whatever
+configuration you are loading, 'DATABASE' would be `$config->{dsn}`
 
     Some::Schema->connect( "dbi:Pg:dbname=blog", "user", "password", { TraceLevel => 1 } )
 
