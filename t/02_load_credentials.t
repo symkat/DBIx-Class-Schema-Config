@@ -92,7 +92,7 @@ my $tests = [
 
 for my $test ( @$tests ) {
     is_deeply( 
-        DBIx::Class::Schema::Credentials->_load_credentials( 
+        DBIx::Class::Schema::Credentials->load_credentials( 
             DBIx::Class::Schema::Credentials->_make_config(
                 ref $test->{put} eq 'ARRAY' ? @{$test->{put}} : $test->{put})
         ), $test->{get}, $test->{title} );

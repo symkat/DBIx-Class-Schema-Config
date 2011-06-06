@@ -6,8 +6,8 @@ use DBIx::Class::Schema::Credentials;
 
 
 is_deeply(
-    [DBIx::Class::Schema::Credentials->_config_paths],
-    [ $ENV{HOME} . "/.dbic", "./dbic", "/etc/dbic"  ],
+    [DBIx::Class::Schema::Credentials->config_paths],
+    [ './dbic', $ENV{HOME} . "/.dbic", "/etc/dbic"  ],
     "_config_paths looks sane.");
 
 done_testing;

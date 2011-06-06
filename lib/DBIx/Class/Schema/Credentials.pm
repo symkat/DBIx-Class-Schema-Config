@@ -38,13 +38,13 @@ sub _make_config {
     };
 }
 
-sub _load_credentials {
+sub load_credentials {
     my ( $class, $config ) = @_;
 
     return $config if $config->{dsn} =~ /^dbi:/i;
 
     # TODO This block is ugly, make it prettier.
-    my $ConfigAny = Config::Any->load_stems( { stems => [$class->_config_paths], use_ext => 1 } );
+    my $ConfigAny = Config::Any->load_stems( { stems => [$class->config_paths], use_ext => 1 } );
 
     for my $cfile ( @$ConfigAny ) {
         my ($filename) = keys %$cfile;
@@ -56,7 +56,7 @@ sub _load_credentials {
     }
 }
 
-sub _config_paths {
+sub config_paths {
     ( './dbic', $ENV{HOME} . '/.dbic', '/etc/dbic' );
 }
 
