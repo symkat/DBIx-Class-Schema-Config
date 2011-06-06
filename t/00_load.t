@@ -8,7 +8,7 @@ my @want_modules = qw/
     DBIx::Class
     Test::MockObject
     DBIx::Class::Schema
-    DBIx::Class::Schema::Credentials
+    DBIx::Class::Schema::Config
 /;
 
 use_ok( $_ ) for @want_modules;

@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use Test::More;
-use DBIx::Class::Schema::Credentials;
+use DBIx::Class::Schema::Config;
 
 my $tests = [
     {
@@ -54,7 +54,7 @@ my $tests = [
 
 for my $test ( @$tests ) {
     is_deeply( 
-        DBIx::Class::Schema::Credentials->_make_config( 
+        DBIx::Class::Schema::Config->_make_config( 
             ref $test->{put} eq 'ARRAY' ? @{$test->{put}} : $test->{put}
         ), $test->{get}, $test->{title} );
 }

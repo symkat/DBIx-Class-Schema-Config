@@ -2,11 +2,11 @@
 use warnings;
 use strict;
 use Test::More;
-use DBIx::Class::Schema::Credentials;
+use DBIx::Class::Schema::Config;
 
 
 is_deeply(
-    [DBIx::Class::Schema::Credentials->config_paths],
+    [DBIx::Class::Schema::Config->config_paths],
     [ './dbic', $ENV{HOME} . "/.dbic", "/etc/dbic"  ],
     "_config_paths looks sane.");
 
