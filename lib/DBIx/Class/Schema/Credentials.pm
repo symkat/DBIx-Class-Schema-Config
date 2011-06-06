@@ -49,7 +49,7 @@ sub load_credentials {
     for my $cfile ( @$ConfigAny ) {
         my ($filename) = keys %$cfile;
         for my $database ( keys %{$cfile->{$filename}} ) {
-            if ( lc($database) eq lc($config->{dsn}) ) {
+            if ( $database eq $config->{dsn} ) {
                 return $cfile->{$filename}->{$database};
             }
         }
