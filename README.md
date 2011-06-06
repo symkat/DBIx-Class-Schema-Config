@@ -54,7 +54,7 @@ Override this function to change the configuration paths that are searched, for 
     use base 'DBIx::Class::Schema::Credentials';
     
 
-   # Override _config_paths to search /var/config/dbic.* and /etc/myproject/project.*
+    # Override _config_paths to search /var/config/dbic.* and /etc/myproject/project.*
     sub _config_paths {
         ( '/var/config/dbic', '/etc/myproject/project' );
     }
@@ -63,7 +63,9 @@ Override this function to change the configuration paths that are searched, for 
 
 Override this function to change the way that DBIx::Class::Schema::Credentials loads credentials, the functions takes the class name, as well as a hashref.
 
-    if called as ->connect( "dbi:Pg:dbname=blog", "user", "password", { TraceLevel => 1 } )
+    Some::Schema->connect( "dbi:Pg:dbname=blog", "user", "password", { TraceLevel => 1 } )
+
+Would result in the following data structure as $config in `_load_credentials($class, $config)`:
 
     {
         dsn           => "dbi:Pg:dbname=blog",
