@@ -43,11 +43,14 @@ This module will load the files in the following order if they exist:
 
 The files should have an extension that Config::Any recognizes, for example /etc/dbic.__yaml__.
 
+NOTE:  The first acceptable configuration loaded will be used.  As such, DATABASE in ./dbic.yaml
+would be used before DATABASE in /etc/dbic.yaml.
+
 # OVERRIDING
 
 The API has been designed to be simple to override if you need more specific configuration loading.
 
-## _config_paths
+## config_paths
 
 Override this function to change the configuration paths that are searched, for example:
 
@@ -59,24 +62,24 @@ Override this function to change the configuration paths that are searched, for 
 
     # Override _config_paths to search 
     # /var/config/dbic.* and /etc/myproject/project.*
-    sub _config_paths {
+    sub config_paths {
         ( '/var/config/dbic', '/etc/myproject/project' );
     }
 
-## _load_credentials
+## load_credentials
 
 Override this function to change the way that DBIx::Class::Schema::Credentials 
 loads credentials, the functions takes the class name, as well as a hashref.
 
     Some::Schema->connect( "dbi:Pg:dbname=blog", "user", "password", { TraceLevel => 1 } )
 
-Would result in the following data structure as $config in `_load_credentials($class, $config)`:
+Would result in the following data structure as $config in `load_credentials($class, $config)`:
 
     {
-        dsn           => "dbi:Pg:dbname=blog",
-        user          => "user",
+        dsn      => "dbi:Pg:dbname=blog",
+        user     => "user",
         password => "password",
-        options     => {
+        options  => {
             TraceLevel => 1,
         },
     }
@@ -96,7 +99,7 @@ The function should return the same structure.  For instance:
 
 
     # Load credentials from internal web server.
-    sub _load_credentials {
+    sub load_credentials {
         my ( $class, $config ) = @_;
 
         return $config if $config->{dsn} =~ /^dbi:/i;
