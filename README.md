@@ -48,25 +48,24 @@ will only be looked at if it was not found in ./dbic.yaml.  If there are duplica
 one file (such that DATABASE is listed twice in ~/.dbic.yaml) the first configuration 
 will be used.
 
+## CHANGE CONFIG PATH
+
+Use `__PACKAGE__->config_paths([( '/file/stub', '/var/www/etc/dbic')]);` to change the paths
+that are searched.  For example:
+
+    package My::Schema
+    use warnings;
+    use strict;
+
+    use base 'DBIx::Class::Schema::Config';
+    __PACKAGE__->config_paths( [ ( '/var/www/secret/dbic', '/opt/database' ) ] );
+
+The above code would have `/var/www/secret/dbic.*` and `/opt/database.*` searched.  As
+above, the first credentials found would be used.
+
 # OVERRIDING
 
 The API has been designed to be simple to override if you need more specific configuration loading.
-
-## config_paths
-
-Override this function to change the configuration paths that are searched, for example:
-
-    package My::Credentials
-    use warnings;
-    use strict;
-    use base 'DBIx::Class::Schema::Credentials';
-    
-
-    # Override _config_paths to search 
-    # /var/config/dbic.* and /etc/myproject/project.*
-    sub config_paths {
-        ( '/var/config/dbic', '/etc/myproject/project' );
-    }
 
 ## load_credentials
 

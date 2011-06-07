@@ -2,12 +2,19 @@
 use warnings;
 use strict;
 use Test::More;
-use DBIx::Class::Schema::Config;
-
+use base 'DBIx::Class::Schema::Config';
 
 is_deeply(
-    [DBIx::Class::Schema::Config->config_paths],
+    __PACKAGE__->config_paths,
     [ './dbic', $ENV{HOME} . "/.dbic", "/etc/dbic"  ],
     "_config_paths looks sane.");
+
+__PACKAGE__->config_paths( [ ( './this', '/var/www/that' ) ] );
+
+is_deeply(
+    __PACKAGE__->config_paths,
+    [ './this', '/var/www/that'  ],
+    "_config_paths can be modified.");
+
 
 done_testing;

@@ -44,7 +44,7 @@ sub load_credentials {
     return $config if $config->{dsn} =~ /^dbi:/i;
 
     # TODO This block is ugly, make it prettier.
-    my $ConfigAny = Config::Any->load_stems( { stems => [$class->config_paths], use_ext => 1 } );
+    my $ConfigAny = Config::Any->load_stems( { stems => $class->config_paths, use_ext => 1 } );
 
     for my $cfile ( @$ConfigAny ) {
         my ($filename) = keys %$cfile;
@@ -56,9 +56,8 @@ sub load_credentials {
     }
 }
 
-sub config_paths {
-    ( './dbic', $ENV{HOME} . '/.dbic', '/etc/dbic' );
-}
+__PACKAGE__->mk_classaccessor('config_paths'); 
+__PACKAGE__->config_paths([ ('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic') ]);
 
 1;
 =head1 NAME
@@ -111,25 +110,24 @@ will only be looked at if it was not found in ./dbic.yaml.  If there are duplica
 one file (such that DATABASE is listed twice in ~/.dbic.yaml) the first configuration 
 will be used.
 
+=head1 CHANGE CONFIG PATH
+
+Use B<__PACKAGE__->config_paths([( '/file/stub', '/var/www/etc/dbic')]);> to change the paths
+that are searched.  For example:
+
+    package My::Schema
+    use warnings;
+    use strict;
+
+    use base 'DBIx::Class::Schema::Config';
+    __PACKAGE__->config_paths( [ ( '/var/www/secret/dbic', '/opt/database' ) ] );
+
+The above code would have B</var/www/secret/dbic.*> and B</opt/database.*> searched.  As
+above, the first credentials found would be used.
+
 =head1 OVERRIDING
 
 The API has been designed to be simple to override if you need more specific configuration loading.
-
-=head2 config_paths
-
-Override this function to change the configuration paths that are searched, for example:
-
-    package My::Credentials
-    use warnings;
-    use strict;
-    use base 'DBIx::Class::Schema::Credentials';
-    
-
-    # Override _config_paths to search 
-    # /var/config/dbic.* and /etc/myproject/project.*
-    sub config_paths {
-        ( '/var/config/dbic', '/etc/myproject/project' );
-    }
 
 =head2 load_credentials
 
