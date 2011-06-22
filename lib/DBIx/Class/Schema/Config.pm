@@ -5,7 +5,7 @@ use strict;
 use base 'DBIx::Class::Schema';
 use Data::Dumper;
 
-our $VERSION = '0.001000'; # 0.1.0
+our $VERSION = '0.001001'; # 0.1.1
 $VERSION = eval $VERSION;
 
 
