@@ -3,7 +3,6 @@ use 5.005;
 use warnings;
 use strict;
 use base 'DBIx::Class::Schema';
-use Config::Any;
 use Data::Dumper;
 
 our $VERSION = '0.001000'; # 0.1.0
@@ -45,6 +44,7 @@ sub _make_config {
 
 sub load_credentials {
     my ( $class, $config ) = @_;
+    require Config::Any;
 
     return $config if $config->{dsn} =~ /^dbi:/i;
 
