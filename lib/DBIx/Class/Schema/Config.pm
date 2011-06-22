@@ -15,7 +15,7 @@ sub connection {
 
     my $config = $class->load_credentials( $class->_make_config( @info ) );
     
-    return $class->SUPER::connection(
+    return $class->next::method(
         $config->{dsn},
         $config->{user},
         $config->{password},
