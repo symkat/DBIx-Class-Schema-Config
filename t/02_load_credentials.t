@@ -20,6 +20,12 @@ Test::MockObject->fake_module(
                         dsn => 'dbi:mysql:dbname=epsilon', 
                         user => 'Bravo',
                         pass => 'ShiJulIanDav',
+                    },
+                    OPTIONS => {
+                        dsn => 'dbi:SQLite:dbfile=:memory:',
+                        user => 'Happy',
+                        pass => 'User',
+                        TRACE_LEVEL => 5,
                     }
                 },
                 'some_other_file' => {
@@ -28,7 +34,7 @@ Test::MockObject->fake_module(
                         user => 'YawnyPants',
                         pass => 'WhyDoYouHateUs?',
                     },
-                }
+                },
             }
         ]
     }
@@ -68,7 +74,6 @@ my $tests = [
             dsn  => 'dbi:mysql:dbname=foo',
             user => 'username',
             password => 'password',
-            options => undef,
         },
         title => "Pass through of normal ->connect as array.",
     },
@@ -82,10 +87,18 @@ my $tests = [
             dsn  => 'dbi:mysql:dbname=foo',
             user => 'username',
             password => 'password',
-            options => {},
         },
         title => "Pass through of normal ->connect as hashref.",
     },
+    {
+        put => [ 'OPTIONS' ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'Happy',
+            pass => 'User',
+            TRACE_LEVEL => 5,
+        }
+    }
 
 
 ];
