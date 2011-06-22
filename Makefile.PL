@@ -9,6 +9,7 @@ license         'bsd';
 requires       'DBIx::Class'            => '0.08100';
 
 test_requires  'Test::More'             => '0.42';
+test_requires  'DBD::SQLite3'           => '0';
 test_requires  'Test::MockObject'       => '1.09';
 
 WriteAll;

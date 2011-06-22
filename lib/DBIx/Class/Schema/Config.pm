@@ -17,6 +17,7 @@ sub connection {
     $config = $class->load_credentials( $config )
         unless $config->{dsn} =~ /^dbi:/;
     
+    return $class->next::method( $config );
     return $class->next::method(
         $config->{dsn},
         $config->{user},
@@ -28,11 +29,14 @@ sub connection {
 # Normalize arrays into hashes, so we have only one form
 # to work with later.
 sub _make_config {
-    my ( $class, $dsn, $user, $pass, $options ) = @_;
+    my ( $class, $dsn, $user, $pass, $dbi_attr, $extra_attr ) = @_;
     return $dsn if ref $dsn eq 'HASH';
-    return ref $options eq 'HASH'
-        ? { dsn => $dsn, user => $user, password => $pass, %$options }
-        : { dsn => $dsn, user => $user, password => $pass };
+
+    my %connection = ( dsn => $dsn, user => $user, password => $pass );
+
+    return { %connection, %$dbi_attr, %$extra_attr} if $extra_attr;
+    return { %connection, %$dbi_attr } if $dbi_attr;
+    return { %connection };
 }
 
 sub load_credentials {
