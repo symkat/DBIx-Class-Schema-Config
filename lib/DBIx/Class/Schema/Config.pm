@@ -18,12 +18,6 @@ sub connection {
         unless $config->{dsn} =~ /^dbi:/;
     
     return $class->next::method( $config );
-    return $class->next::method(
-        $config->{dsn},
-        $config->{user},
-        $config->{password},
-        $config->{options},
-    );
 }
 
 # Normalize arrays into hashes, so we have only one form
