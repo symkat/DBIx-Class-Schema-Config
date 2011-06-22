@@ -12,7 +12,10 @@ $VERSION = eval $VERSION;
 sub connection {
     my ( $class, @info ) = @_;
 
-    my $config = $class->load_credentials( $class->_make_config( @info ) );
+    my $config = $class->_make_config( @info );
+    
+    $config = $class->load_credentials( $config )
+        unless $config->{dsn} =~ /^dbi:/;
     
     return $class->next::method(
         $config->{dsn},
@@ -22,24 +25,14 @@ sub connection {
     );
 }
 
+# Normalize arrays into hashes, so we have only one form
+# to work with later.
 sub _make_config {
     my ( $class, $dsn, $user, $pass, $options ) = @_;
-    
-    if ( ref $dsn eq 'HASH' ) {
-        # Handle the special case of Test::DBIx::Class
-        my $config = { };
-        $config->{user}         = delete $dsn->{user};
-        $config->{password}     = delete $dsn->{password};
-        $config->{dsn}          = delete $dsn->{dsn};
-        $config->{options}      = $dsn;
-        return $config;
-    }
-    return { 
-        dsn      => $dsn, 
-        user     => $user, 
-        password => $pass,
-        options  => $options,
-    };
+    return $dsn if ref $dsn eq 'HASH';
+    return ref $options eq 'HASH'
+        ? { dsn => $dsn, user => $user, password => $pass, %$options }
+        : { dsn => $dsn, user => $user, password => $pass };
 }
 
 sub load_credentials {
