@@ -1,3 +1,15 @@
+0.1.2
+    - Makefile.PL depends on DBD::SQLite not DBD::SQLite3
+    - _make_config has a less annoying return
+    - connection() no longer tries to block ->load_credentials,
+      it is load_credential's responsablity to to check for credentials
+      it should allow to fall through.
+    - Added accessor on_credential_load, it provides access to the config
+      structure that load_credentials creates, and expects it as the return.
+      It can be used to make changes to the credentials, such as decrypting
+      passwords from the config file.
+    - A new Schema base was created for testing on_credential_load
+    - New tests added for on_credential_load
 0.1.1:
     - Replace SUPER:: with next::method
     - Don't call load_credentials unless we're actually going to load some

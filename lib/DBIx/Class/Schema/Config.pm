@@ -14,8 +14,7 @@ sub connection {
 
     my $config = $class->_make_config( @info );
     
-    $config = $class->load_credentials( $config )
-        unless $config->{dsn} =~ /^dbi:/;
+    $config = $class->load_credentials( $config );
     
     return $class->next::method( $config );
 }
@@ -28,16 +27,14 @@ sub _make_config {
 
     my %connection = ( dsn => $dsn, user => $user, password => $pass );
 
-    return { %connection, %$dbi_attr, %$extra_attr} if $extra_attr;
-    return { %connection, %$dbi_attr } if $dbi_attr;
-    return { %connection };
+    return { %connection, %{$dbi_attr || {} }, %{ $extra_attr || {} } }; 
 }
 
 sub load_credentials {
     my ( $class, $config ) = @_;
     require Config::Any;
 
-    return $config if $config->{dsn} =~ /^dbi:/i;
+    return $config if $config->{dsn} =~ /^dbi:/i; 
 
     # TODO This block is ugly, make it prettier.
     my $ConfigAny = Config::Any->load_stems( { stems => $class->config_paths, use_ext => 1 } );
@@ -46,14 +43,16 @@ sub load_credentials {
         my ($filename) = keys %$cfile;
         for my $database ( keys %{$cfile->{$filename}} ) {
             if ( $database eq $config->{dsn} ) {
-                return $cfile->{$filename}->{$database};
+                return $class->on_credential_load->($config, $cfile->{$filename}->{$database});
             }
         }
     }
 }
 
 __PACKAGE__->mk_classaccessor('config_paths'); 
+__PACKAGE__->mk_classaccessor('on_credential_load'); 
 __PACKAGE__->config_paths([ ('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic') ]);
+__PACKAGE__->on_credential_load( sub { my ( $orig, $new ) = @_; return $new } );
 
 1;
 =head1 NAME
@@ -124,6 +123,56 @@ above, the first credentials found would be used.
 =head1 OVERRIDING
 
 The API has been designed to be simple to override if you need more specific configuration loading.
+
+=head2 on_credential_load
+
+Give a code reference to this accessor if you want to change
+the loaded credentials before they are passed to DBIC.  Useful
+use-cases for this include decrypting encrypted passwords, or
+making programatic changes to the configuration file.
+
+    __PACKAGE__->on_credential_load( sub { my ( $orig, $new ) = @_; } );
+
+$orig is the structure originally passed on ->connect() after it has
+been turned into a hash.  For instance ->connect('DATABASE', 'USERNAME')
+will result in $orig->{dsn} eq 'DATABASE' and $orig->{user} eq 'USERNAME'.
+
+$new is the structure after it has been loaded from the configuration file.  In this
+case, $new->{user} eq 'WalterWhite' and $new->{dsn} eq 
+'DBI:mysql:database=students;host=%s;port=3306'.
+
+For instance, if you want to use hostnames when you make the
+initial connection to DBIC and are using the configuration primarily
+for usernames, passwords and other configuration data, you can create
+a config like the following:
+
+    DATABASE:
+        dsn: "DBI:mysql:database=students;host=%s;port=3306"
+        user: "WalterWhite"
+        password: "relykS"
+
+In your Schema class you could include the following:
+
+    package My::Schema
+    use warnings;
+    use strict;
+    use base 'DBIx::Class::Schema::Config';
+    
+    __PACKAGE__->on_credential_load(
+        sub {
+            my ( $orig, $new ) = @_;
+            if ( $new->{dsn} =~ /\%s/ ) {
+                $new->{dsn} = sprintf($new->{dsn}, $orig->{user});
+            }
+            return $new;
+        }
+    );
+
+    __PACKAGE__->load_classes;
+    1;
+
+See load_credentials for more complex changes that require changing
+how the configuration itself is loaded.
 
 =head2 load_credentials
 
