@@ -3,19 +3,17 @@ use 5.005;
 use warnings;
 use strict;
 use base 'DBIx::Class::Schema';
-use Data::Dumper;
 
 our $VERSION = '0.001002'; # 0.1.2
 $VERSION = eval $VERSION;
 
-
 sub connection {
     my ( $class, @info ) = @_;
 
-    my $config = $class->_make_config( @info );
-    
-    $config = $class->load_credentials( $config );
-    
+    my $config = $class->load_credentials(
+        $class->_make_config( @info )
+    );
+
     return $class->next::method( $config );
 }
 
@@ -36,14 +34,17 @@ sub load_credentials {
 
     return $config if $config->{dsn} =~ /^dbi:/i; 
 
-    # TODO This block is ugly, make it prettier.
-    my $ConfigAny = Config::Any->load_stems( { stems => $class->config_paths, use_ext => 1 } );
+    my $ConfigAny = Config::Any
+        ->load_stems( { stems => $class->config_paths, use_ext => 1 } );
 
     for my $cfile ( @$ConfigAny ) {
-        my ($filename) = keys %$cfile;
-        for my $database ( keys %{$cfile->{$filename}} ) {
-            if ( $database eq $config->{dsn} ) {
-                return $class->on_credential_load->($config, $cfile->{$filename}->{$database});
+        for my $filename ( keys %$cfile ) {
+            for my $database ( keys %{$cfile->{$filename}} ) {
+                if ( $database eq $config->{dsn} ) {
+                    return $class
+                        ->on_credential_load
+                        ->($config, $cfile->{$filename}->{$database});
+                }
             }
         }
     }
@@ -51,13 +52,14 @@ sub load_credentials {
 
 __PACKAGE__->mk_classaccessor('config_paths'); 
 __PACKAGE__->mk_classaccessor('on_credential_load'); 
-__PACKAGE__->config_paths([ ('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic') ]);
-__PACKAGE__->on_credential_load( sub { my ( $orig, $new ) = @_; return $new } );
+__PACKAGE__->config_paths([('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic')]);
+__PACKAGE__->on_credential_load(sub { my ( $orig, $new ) = @_; return $new });
 
 1;
 =head1 NAME
 
-DBIx::Class::Schema::Config - Manage connection credentials for DBIx::Class::Schema in a file.
+DBIx::Class::Schema::Config - 
+Manage connection credentials for DBIx::Class::Schema in a file.
 
 =head1 SYNOPSIS
 
@@ -104,33 +106,33 @@ This module will load the files in the following order if they exist:
 
 =back
 
-The files should have an extension that L<Config::Any> recognizes, for example 
-/etc/dbic.B<yaml>.
+The files should have an extension that L<Config::Any> recognizes, 
+for example /etc/dbic.B<yaml>.
 
-NOTE:  The first available credential will be used.  Therefore I<DATABASE> in ~/.dbic.yaml 
-will only be looked at if it was not found in ./dbic.yaml.  If there are duplicates in
-one file (such that DATABASE is listed twice in ~/.dbic.yaml) the first configuration 
-will be used.
+NOTE:  The first available credential will be used.  Therefore I<DATABASE> 
+in ~/.dbic.yaml will only be looked at if it was not found in ./dbic.yaml.  
+If there are duplicates in one file (such that DATABASE is listed twice in 
+~/.dbic.yaml) the first configuration will be used.
 
 =head1 CHANGE CONFIG PATH
 
-Use C<__PACKAGE__-E<gt>config_paths([( '/file/stub', '/var/www/etc/dbic')]);> to change the paths
-that are searched.  For example:
+Use C<__PACKAGE__-E<gt>config_paths([( '/file/stub', '/var/www/etc/dbic')]);> 
+to change the paths that are searched.  For example:
 
     package My::Schema
     use warnings;
     use strict;
 
     use base 'DBIx::Class::Schema::Config';
-    __PACKAGE__->config_paths( [ ( '/var/www/secret/dbic', '/opt/database' ) ] );
+    __PACKAGE__->config_paths([( '/var/www/secret/dbic', '/opt/database' )]);
 
-The above code would have I</var/www/secret/dbic.*> and I</opt/database.*> searched.  As
-above, the first credentials found would be used.
+The above code would have I</var/www/secret/dbic.*> and I</opt/database.*> 
+searched.  As above, the first credentials found would be used.
 
 =head1 OVERRIDING
 
-The API has been designed to be simple to override if you have additional needs in loading
-DBIC configurations.
+The API has been designed to be simple to override if you have additional 
+needs in loading DBIC configurations.
 
 =head2 on_credential_load
 
@@ -146,8 +148,8 @@ been turned into a hash.  For instance C<-E<gt>connect('DATABASE', 'USERNAME')>
 will result in C<$orig-E<gt>{dsn}> eq B<DATABASE> and C<$orig-E<gt>{user}> eq 
 B<USERNAME>.
 
-C<$new> is the structure after it has been loaded from the configuration file.  In this
-case, C<$new-E<gt>{user}> eq B<WalterWhite> and C<$new-E<gt>{dsn}> eq 
+C<$new> is the structure after it has been loaded from the configuration file.
+In this case, C<$new-E<gt>{user}> eq B<WalterWhite> and C<$new-E<gt>{dsn}> eq 
 B<DBI:mysql:database=students;host=%s;port=3306>.
 
 For instance, if you want to use hostnames when you make the
@@ -188,12 +190,21 @@ how the configuration itself is loaded.
 Override this function to change the way that L<DBIx::Class::Schema::Config>
 loads credentials, the functions takes the class name, as well as a hashref.
 
-If you take the route of having C<-E<gt>connect('DATABASE')> used as a key for whatever
-configuration you are loading, I<DATABASE> would be C<$config-E<gt>{dsn}>
+If you take the route of having C<-E<gt>connect('DATABASE')> used as a key for 
+whatever configuration you are loading, I<DATABASE> would be 
+C<$config-E<gt>{dsn}>
 
-    Some::Schema->connect( "dbi:Pg:dbname=blog", "user", "password", { TraceLevel => 1 } )
+    Some::Schema->connect( 
+        "dbi:Pg:dbname=blog", 
+        "user", 
+        "password", 
+        { 
+            TraceLevel => 1 
+        } 
+    );
 
-Would result in the following data structure as $config in C<load_credentials($class, $config)>:
+Would result in the following data structure as $config in 
+C<load_credentials($class, $config)>:
 
     {
         dsn             => "dbi:Pg:dbname=blog",
@@ -203,8 +214,8 @@ Would result in the following data structure as $config in C<load_credentials($c
     }
 
 It if the responsibility of this function to allow passing through of normal 
-C<-E<gt>connect> calls, this is done by returning the current configuration if the 
-dsn matches ^dbi:.
+C<-E<gt>connect> calls, this is done by returning the current configuration 
+if the dsn matches ^dbi:.
 
 The function should return the same structure.  For instance:
 
@@ -238,6 +249,7 @@ LICENSE file included in this package for more detailed information.
 
 =head1 AVAILABILITY
 
-The latest version of this software is available through GitHub at
+The latest version of this software is available at GitHub 
 https://github.com/symkat/DBIx-Class-Schema-Config
+
 =cut
