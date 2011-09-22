@@ -62,6 +62,14 @@ __PACKAGE__->config_paths([('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic')]);
 DBIx::Class::Schema::Config - 
 Manage connection credentials for DBIx::Class::Schema in a file.
 
+=head1 DESCRIPTION
+
+DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema 
+that allows the loading of credentials from a file.  The actual code 
+itself would only need to know about the name of the database. This 
+aims to make it simpler for operations teams to manage database 
+credentials.
+
 =head1 SYNOPSIS
 
     /etc/dbic.yaml
@@ -69,8 +77,7 @@ Manage connection credentials for DBIx::Class::Schema in a file.
         dsn: "rbi:Pg:host=localhost;database=blog"
         user: "TheDoctor"
         password: "dnoPydoleM"
-        options:
-            TraceLevel: 1
+        TraceLevel: 1
 
     package My::Schema
     use warnings;
@@ -85,13 +92,6 @@ Manage connection credentials for DBIx::Class::Schema in a file.
     use My::Schema;
 
     my $schema = My::Schema->connect('MY_DATABASE');
-
-=head1 DESCRIPTION
-
-DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema 
-that allows the loading of credentials from a file.  The actual code 
-itself would only need to know about the name of the database, this 
-aims to make it simpler for operations teams to manage database credentials.
 
 =head1 CONFIG FILES
 

@@ -1,3 +1,11 @@
+=head1 DESCRIPTION
+
+DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema 
+that allows the loading of credentials from a file.  The actual code 
+itself would only need to know about the name of the database. This 
+aims to make it simpler for operations teams to manage database 
+credentials.
+
 =head1 SYNOPSIS
 
     /etc/dbic.yaml
@@ -5,8 +13,7 @@
         dsn: "rbi:Pg:host=localhost;database=blog"
         user: "TheDoctor"
         password: "dnoPydoleM"
-        options:
-            TraceLevel: 1
+        TraceLevel: 1
 
     package My::Schema
     use warnings;
@@ -21,13 +28,6 @@
     use My::Schema;
 
     my $schema = My::Schema->connect('MY_DATABASE');
-
-=head1 DESCRIPTION
-
-DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema 
-that allows the loading of credentials from a file.  The actual code 
-itself would only need to know about the name of the database, this 
-aims to make it simpler for operations teams to manage database credentials.
 
 =head1 CONFIG FILES
 
@@ -71,23 +71,28 @@ searched.  As above, the first credentials found would be used.
 The API has been designed to be simple to override if you have additional 
 needs in loading DBIC configurations.
 
-=head2 on_credential_load
+=head2 filter_loaded_credentials
 
-Give a code reference to this accessor if you want to change
-the loaded credentials before they are passed to DBIC.  Useful
-use-cases for this include decrypting encrypted passwords, or
-making programatic changes to the configuration file.
+Override this function if you wanr to change the loaded credentials before
+they are passed to DBIC.  This is useful for use-cases that include decrypting
+encrypted passwords or making progamatic changes to the configuration before
+using it.
 
-    __PACKAGE__->on_credential_load( sub { my ( $orig, $new ) = @_; } );
+    sub filter_loaded_credentials {
+        my ( $class, $loaded_credentials, $connect_args ) = @_;
+        ...
+        return $loaded_credentials;
+    }
 
-C<$orig> is the structure originally passed on C<-E<gt>connect()> after it has
-been turned into a hash.  For instance C<-E<gt>connect('DATABASE', 'USERNAME')>
-will result in C<$orig-E<gt>{dsn}> eq B<DATABASE> and C<$orig-E<gt>{user}> eq 
-B<USERNAME>.
-
-C<$new> is the structure after it has been loaded from the configuration file.
-In this case, C<$new-E<gt>{user}> eq B<WalterWhite> and C<$new-E<gt>{dsn}> eq 
+C<$loaded_credentials> is the structure after it has been loaded from the 
+configuration file.  In this case, C<$loaded_credentials-E<gt>{user}> eq 
+B<WalterWhite> and C<$loaded_credentials-E<gt>{dsn}> eq 
 B<DBI:mysql:database=students;host=%s;port=3306>.
+
+C<$connect_args> is the structure originally passed on C<-E<gt>connect()> after it has
+been turned into a hash.  For instance C<-E<gt>connect('DATABASE', 'USERNAME')>
+will result in C<$connect_args-E<gt>{dsn}> eq B<DATABASE> and 
+C<$connect_args-E<gt>{user}> eq B<USERNAME>.
 
 For instance, if you want to use hostnames when you make the
 initial connection to DBIC and are using the configuration primarily
@@ -105,19 +110,20 @@ In your Schema class you could include the following:
     use warnings;
     use strict;
     use base 'DBIx::Class::Schema::Config';
-    
-    __PACKAGE__->on_credential_load(
-        sub {
-            my ( $orig, $new ) = @_;
-            if ( $new->{dsn} =~ /\%s/ ) {
-                $new->{dsn} = sprintf($new->{dsn}, $orig->{user});
-            }
-            return $new;
-        }
-    );
 
+    sub filter_loaded_credentials {
+        my ( $class, $loaded_credentials, $connect_args ) = @_;
+        if ( $loaded_credentials->{dsn} =~ /\%s/ ) {
+            $loaded_credentials->{dsn} = sprintf( $loaded_credentials->{dsn},
+                $connect_args->{user});
+        }
+    }
+    
     __PACKAGE__->load_classes;
     1;
+
+Then the connection could be done with 
+C<$Schema-E<gt>connect('DATABASE', 'my.hostname.com');>
 
 See L</load_credentials> for more complex changes that require changing
 how the configuration itself is loaded.
@@ -155,14 +161,13 @@ C<-E<gt>connect> calls, this is done by returning the current configuration
 if the dsn matches ^dbi:.
 
 The function should return the same structure.  For instance:
-
-    package My::Credentials
+    
+    package My::Schema
     use warnings;
     use strict;
-    use base 'DBIx::Class::Schema::Credentials';
+    use base 'DBIx::Class::Schema::Config';
     use LWP::Simple;
     use JSON
-
 
     # Load credentials from internal web server.
     sub load_credentials {
@@ -174,6 +179,8 @@ The function should return the same structure.  For instance:
             get( "http://someserver.com/v1.0/database?key=somesecret&db=" . 
                 $config->{dsn}  ));
     }
+    
+    __PACKAGE__->load_classes;
 
 =head1 AUTHOR
 
