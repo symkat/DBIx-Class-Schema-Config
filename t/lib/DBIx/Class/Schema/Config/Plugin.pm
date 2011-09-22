@@ -6,15 +6,14 @@ use warnings;
 use base 'DBIx::Class::Schema::Config';
 
 __PACKAGE__->config_paths( [ ( 't/etc/config' ) ] );
-__PACKAGE__->on_credential_load(
-    sub {
-        my ( $orig, $new ) = @_;
-        if ( $new->{dsn} =~ /\%s/ ) {
-            $new->{dsn} = sprintf($new->{dsn}, $orig->{user});
-        }
-        return $new;
+
+sub filter_loaded_credentials {
+    my ( $class, $orig, $new ) = @_;
+    if ( $new->{dsn} =~ /\%s/ ) {
+        $new->{dsn} = sprintf($new->{dsn}, $orig->{user});
     }
-);
+    return $new;
+}
 
 __PACKAGE__->load_classes;
 1;

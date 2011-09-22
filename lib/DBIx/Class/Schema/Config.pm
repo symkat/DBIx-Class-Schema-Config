@@ -41,19 +41,18 @@ sub load_credentials {
         for my $filename ( keys %$cfile ) {
             for my $database ( keys %{$cfile->{$filename}} ) {
                 if ( $database eq $config->{dsn} ) {
-                    return $class
-                        ->on_credential_load
-                        ->($config, $cfile->{$filename}->{$database});
+                    my $new = $cfile->{$filename}->{$database};
+                    return $class->filter_loaded_credentials($config,$new);
                 }
             }
         }
     }
 }
 
+sub filter_loaded_credentials { $_[2] };
+
 __PACKAGE__->mk_classaccessor('config_paths'); 
-__PACKAGE__->mk_classaccessor('on_credential_load'); 
 __PACKAGE__->config_paths([('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic')]);
-__PACKAGE__->on_credential_load(sub { my ( $orig, $new ) = @_; return $new });
 
 1;
 =head1 NAME
