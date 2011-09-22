@@ -57,6 +57,7 @@ __PACKAGE__->mk_classaccessor('config_paths');
 __PACKAGE__->config_paths([('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic')]);
 
 1;
+
 =head1 NAME
 
 DBIx::Class::Schema::Config - 
@@ -113,7 +114,7 @@ for example /etc/dbic.B<yaml>.
 NOTE:  The first available credential will be used.  Therefore I<DATABASE> 
 in ~/.dbic.yaml will only be looked at if it was not found in ./dbic.yaml.  
 If there are duplicates in one file (such that DATABASE is listed twice in 
-~/.dbic.yaml) the first configuration will be used.
+~/.dbic.yaml,) the first configuration will be used.
 
 =head1 CHANGE CONFIG PATH
 
@@ -137,7 +138,7 @@ needs in loading DBIC configurations.
 
 =head2 filter_loaded_credentials
 
-Override this function if you wanr to change the loaded credentials before
+Override this function if you want to change the loaded credentials before
 they are passed to DBIC.  This is useful for use-cases that include decrypting
 encrypted passwords or making progamatic changes to the configuration before
 using it.
@@ -154,7 +155,7 @@ B<WalterWhite> and C<$loaded_credentials-E<gt>{dsn}> eq
 B<DBI:mysql:database=students;host=%s;port=3306>.
 
 C<$connect_args> is the structure originally passed on C<-E<gt>connect()> after it has
-been turned into a hash.  For instance C<-E<gt>connect('DATABASE', 'USERNAME')>
+been turned into a hash.  For instance, C<-E<gt>connect('DATABASE', 'USERNAME')>
 will result in C<$connect_args-E<gt>{dsn}> eq B<DATABASE> and 
 C<$connect_args-E<gt>{user}> eq B<USERNAME>.
 
@@ -168,7 +169,7 @@ a config like the following:
         user: "WalterWhite"
         password: "relykS"
 
-In your Schema class you could include the following:
+In your Schema class, you could include the following:
 
     package My::Schema
     use warnings;
@@ -195,7 +196,7 @@ how the configuration itself is loaded.
 =head2 load_credentials
 
 Override this function to change the way that L<DBIx::Class::Schema::Config>
-loads credentials, the functions takes the class name, as well as a hashref.
+loads credentials.  The function takes the class name, as well as a hashref.
 
 If you take the route of having C<-E<gt>connect('DATABASE')> used as a key for 
 whatever configuration you are loading, I<DATABASE> would be 
@@ -220,7 +221,7 @@ C<load_credentials($class, $config)>:
         TraceLevel      => 1,
     }
 
-It if the responsibility of this function to allow passing through of normal 
+It is the responsibility of this function to allow passing through of normal 
 C<-E<gt>connect> calls, this is done by returning the current configuration 
 if the dsn matches ^dbi:.
 
