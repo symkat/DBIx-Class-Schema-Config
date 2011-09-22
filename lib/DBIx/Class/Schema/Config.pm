@@ -143,7 +143,7 @@ making programatic changes to the configuration file.
 
 C<$orig> is the structure originally passed on C<-E<gt>connect()> after it has
 been turned into a hash.  For instance C<-E<gt>connect('DATABASE', 'USERNAME')>
-will result in C<$orig-E<GT>{dsn}> eq B<DATABASE> and C<$orig-E<gt>{user}> eq 
+will result in C<$orig-E<gt>{dsn}> eq B<DATABASE> and C<$orig-E<gt>{user}> eq 
 B<USERNAME>.
 
 C<$new> is the structure after it has been loaded from the configuration file.  In this
