@@ -1,3 +1,8 @@
+=head1 NAME
+
+DBIx::Class::Schema::Config - 
+Manage connection credentials for DBIx::Class::Schema in a file.
+
 =head1 DESCRIPTION
 
 DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema 
