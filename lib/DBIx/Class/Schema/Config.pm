@@ -29,10 +29,10 @@ sub _make_config {
 }
 
 sub load_credentials {
-    my ( $class, $config ) = @_;
+    my ( $class, $connect_args ) = @_;
     require Config::Any;
 
-    return $config if $config->{dsn} =~ /^dbi:/i; 
+    return $connect_args if $connect_args->{dsn} =~ /^dbi:/i; 
 
     my $ConfigAny = Config::Any
         ->load_stems( { stems => $class->config_paths, use_ext => 1 } );
@@ -40,16 +40,18 @@ sub load_credentials {
     for my $cfile ( @$ConfigAny ) {
         for my $filename ( keys %$cfile ) {
             for my $database ( keys %{$cfile->{$filename}} ) {
-                if ( $database eq $config->{dsn} ) {
-                    my $new = $cfile->{$filename}->{$database};
-                    return $class->filter_loaded_credentials($config,$new);
+                if ( $database eq $connect_args->{dsn} ) {
+                    my $loaded_credentials = $cfile->{$filename}->{$database};
+                    return $class->filter_loaded_credentials(
+                        $loaded_credentials,$connect_args
+                    );
                 }
             }
         }
     }
 }
 
-sub filter_loaded_credentials { $_[2] };
+sub filter_loaded_credentials { $_[1] };
 
 __PACKAGE__->mk_classaccessor('config_paths'); 
 __PACKAGE__->config_paths([('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic')]);
