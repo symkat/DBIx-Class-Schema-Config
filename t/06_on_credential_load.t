@@ -8,7 +8,7 @@ use DBIx::Class::Schema::Config::Plugin;
 use Data::Dumper;
 
 # Using a config file, with a plugin changing the DSN.
-ok my $Schema = DBIx::Class::Schema::Config::Plugin->connect('PLUGIN', ':memory:'),
+ok my $Schema = DBIx::Class::Schema::Config::Plugin->connect('PLUGIN', { dbname => ':memory:' }),
     "Connection to a plugin-modified schema works.";
 
 my $expect = [

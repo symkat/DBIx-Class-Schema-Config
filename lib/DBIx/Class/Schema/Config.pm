@@ -4,38 +4,52 @@ use warnings;
 use strict;
 use base 'DBIx::Class::Schema';
 
-our $VERSION = '0.001002'; # 0.1.2
+our $VERSION = '0.001003'; # 0.1.3
 $VERSION = eval $VERSION;
 
 sub connection {
     my ( $class, @info ) = @_;
 
-    my $config = $class->load_credentials(
-        $class->_make_config( @info )
-    );
+    my $config = $class->_make_config(@info);
+
+    # Take responsibility for passing through normal-looking
+    # credentials.
+    $config = $class->load_credentials($config)
+        unless $config->{dsn} =~ /dbi:/i;
 
     return $class->next::method( $config );
 }
 
-# Normalize arrays into hashes, so we have only one form
-# to work with later.
+# Normalize arguments into a single hash.  If we get a single hashref,
+# return it.
+# Check if $user and $pass are hashes to support things like
+# ->connect( 'CONFIG_FILE', { hostname => 'db.foo.com' } );
+
 sub _make_config {
     my ( $class, $dsn, $user, $pass, $dbi_attr, $extra_attr ) = @_;
     return $dsn if ref $dsn eq 'HASH';
 
-    my %connection = ( dsn => $dsn, user => $user, password => $pass );
-
-    return { %connection, %{$dbi_attr || {} }, %{ $extra_attr || {} } }; 
+    return { 
+        dsn => $dsn, 
+        %{ref $user eq 'HASH' ? $user : { user => $user }},
+        %{ref $pass eq 'HASH' ? $pass : { password => $pass }},
+        %{$dbi_attr || {} }, 
+        %{ $extra_attr || {} } 
+    }; 
 }
 
 sub load_credentials {
     my ( $class, $connect_args ) = @_;
-    require Config::Any;
+    require Config::Any; # Only loaded if we need to load credentials.
 
+    # While ->connect is responsible for returning normal-looking
+    # credential information, we do it here as well so that it can be
+    # independently unit tested.
     return $connect_args if $connect_args->{dsn} =~ /^dbi:/i; 
 
-    my $ConfigAny = Config::Any
-        ->load_stems( { stems => $class->config_paths, use_ext => 1 } );
+    my $ConfigAny = Config::Any->load_stems( 
+        { stems => $class->config_paths, use_ext => 1 } 
+    );
 
     for my $cfile ( @$ConfigAny ) {
         for my $filename ( keys %$cfile ) {
@@ -51,6 +65,8 @@ sub load_credentials {
     }
 }
 
+# Intended to be sub-classed, we'll just return the
+# credentials we used in the first place.
 sub filter_loaded_credentials { $_[1] };
 
 __PACKAGE__->mk_classaccessor('config_paths'); 
@@ -67,8 +83,8 @@ Manage connection credentials for DBIx::Class::Schema in a file.
 
 DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema 
 that allows the loading of credentials from a file.  The actual code 
-itself would only need to know about the name of the database. This 
-aims to make it simpler for operations teams to manage database 
+itself would only need to know about the name used in the configuration
+file. This aims to make it simpler for operations teams to manage database
 credentials.
 
 =head1 SYNOPSIS
@@ -129,7 +145,8 @@ to change the paths that are searched.  For example:
     __PACKAGE__->config_paths([( '/var/www/secret/dbic', '/opt/database' )]);
 
 The above code would have I</var/www/secret/dbic.*> and I</opt/database.*> 
-searched.  As above, the first credentials found would be used.
+searched, in that order.  As above, the first credentials found would be used.  
+This will replace the files origionally searched for, not add to them.
 
 =head1 OVERRIDING
 
@@ -159,6 +176,11 @@ been turned into a hash.  For instance, C<-E<gt>connect('DATABASE', 'USERNAME')>
 will result in C<$connect_args-E<gt>{dsn}> eq B<DATABASE> and 
 C<$connect_args-E<gt>{user}> eq B<USERNAME>.
 
+Additional parameters can be added by appending a hashref,
+to the connection call, as an example, C<-E<gt>connect( 'CONFIG', 
+{ hostname =E<lt> "db.foo.com" } );> will give C<$connect_args> a 
+structure like C<{ dsn =E<lt> 'CONFIG', hostname =E<lt> "db.foo.com" }>.
+
 For instance, if you want to use hostnames when you make the
 initial connection to DBIC and are using the configuration primarily
 for usernames, passwords and other configuration data, you can create
@@ -180,7 +202,7 @@ In your Schema class, you could include the following:
         my ( $class, $loaded_credentials, $connect_args ) = @_;
         if ( $loaded_credentials->{dsn} =~ /\%s/ ) {
             $loaded_credentials->{dsn} = sprintf( $loaded_credentials->{dsn},
-                $connect_args->{user});
+                $connect_args->{hostname});
         }
     }
     
@@ -188,7 +210,7 @@ In your Schema class, you could include the following:
     1;
 
 Then the connection could be done with 
-C<$Schema-E<gt>connect('DATABASE', 'my.hostname.com');>
+C<$Schema-E<gt>connect('DATABASE', { hostname => 'my.hostname.com' });>
 
 See L</load_credentials> for more complex changes that require changing
 how the configuration itself is loaded.
@@ -203,9 +225,9 @@ whatever configuration you are loading, I<DATABASE> would be
 C<$config-E<gt>{dsn}>
 
     Some::Schema->connect( 
-        "dbi:Pg:dbname=blog", 
-        "user", 
-        "password", 
+        "SomeTarget", 
+        "Yuri", 
+        "Yawny", 
         { 
             TraceLevel => 1 
         } 
@@ -215,15 +237,15 @@ Would result in the following data structure as $config in
 C<load_credentials($class, $config)>:
 
     {
-        dsn             => "dbi:Pg:dbname=blog",
-        user            => "user",
-        password        => "password",
+        dsn             => "SomeTarget",
+        user            => "Yuri",
+        password        => "Yawny",
         TraceLevel      => 1,
     }
 
-It is the responsibility of this function to allow passing through of normal 
-C<-E<gt>connect> calls, this is done by returning the current configuration 
-if the dsn matches ^dbi:.
+Currently, load_credentials will NOT be called if the first argument to
+C<-E<gt>connect()> looks like a valid DSN.  This is determined by match
+the DSN with C</^dbi:/i>.
 
 The function should return the same structure.  For instance:
     
@@ -237,8 +259,6 @@ The function should return the same structure.  For instance:
     # Load credentials from internal web server.
     sub load_credentials {
         my ( $class, $config ) = @_;
-
-        return $config if $config->{dsn} =~ /^dbi:/i;
 
         return decode_json( 
             get( "http://someserver.com/v1.0/database?key=somesecret&db=" . 

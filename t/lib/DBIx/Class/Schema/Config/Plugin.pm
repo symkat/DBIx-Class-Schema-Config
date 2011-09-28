@@ -10,7 +10,7 @@ __PACKAGE__->config_paths( [ ( 't/etc/config' ) ] );
 sub filter_loaded_credentials {
     my ( $class, $new, $orig ) = @_;
     if ( $new->{dsn} =~ /\%s/ ) {
-        $new->{dsn} = sprintf($new->{dsn}, $orig->{user});
+        $new->{dsn} = sprintf($new->{dsn}, $orig->{dbname});
     }
     return $new;
 }

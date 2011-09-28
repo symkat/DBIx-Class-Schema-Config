@@ -46,6 +46,21 @@ my $tests = [
         },
         title => "Normal option hashes pass through.",
     },
+    {
+        put => [ 'DATABASE', 'USERNAME', { hostname => 'hostname' } ],
+        get => { dsn => 'DATABASE', user => 'USERNAME', hostname => 'hostname' },
+        title => "Ensure (string, string, hashref) format works correctly.",
+    },
+    {
+        put => [ 'DATABASE', 'USERNAME', 'PASSWORD', { hostname => 'hostname' } ],
+        get => { dsn => 'DATABASE', user => 'USERNAME', password => 'PASSWORD', hostname => 'hostname' },
+        title => "Ensure (string, string, string, hashref) format works correctly.",
+    },
+    {
+        put => [ 'DATABASE', 'U', 'P', { foo => "bar" }, { hostname => 'hostname' } ],
+        get => { dsn => 'DATABASE', user => 'U', password => 'P', foo => "bar", hostname => 'hostname' },
+        title => "Ensure (string, string, string, hashref, hashref) format works correctly.",
+    },
 
 ];
 
