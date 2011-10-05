@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use base 'DBIx::Class::Schema';
 
-our $VERSION = '0.001003'; # 0.1.3
+our $VERSION = '0.001004'; # 0.1.4
 $VERSION = eval $VERSION;
 
 sub connection {
@@ -76,8 +76,7 @@ __PACKAGE__->config_paths([('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic')]);
 
 =head1 NAME
 
-DBIx::Class::Schema::Config - 
-Manage connection credentials for DBIx::Class::Schema in a file.
+DBIx::Class::Schema::Config - Credential Management for DBIx::Class 
 
 =head1 DESCRIPTION
 
@@ -85,7 +84,11 @@ DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema
 that allows the loading of credentials from a file.  The actual code 
 itself would only need to know about the name used in the configuration
 file. This aims to make it simpler for operations teams to manage database
-credentials.
+credentials.  
+
+A simple tutorial that compliments this documentation and explains converting 
+an existing DBIx::Class Schema to usingthis software to manage credentials can 
+be found at L<http://www.symkat.com/credential-management-in-dbix-class>
 
 =head1 SYNOPSIS
 
@@ -171,10 +174,11 @@ configuration file.  In this case, C<$loaded_credentials-E<gt>{user}> eq
 B<WalterWhite> and C<$loaded_credentials-E<gt>{dsn}> eq 
 B<DBI:mysql:database=students;host=%s;port=3306>.
 
-C<$connect_args> is the structure originally passed on C<-E<gt>connect()> after it has
-been turned into a hash.  For instance, C<-E<gt>connect('DATABASE', 'USERNAME')>
-will result in C<$connect_args-E<gt>{dsn}> eq B<DATABASE> and 
-C<$connect_args-E<gt>{user}> eq B<USERNAME>.
+C<$connect_args> is the structure originally passed on C<-E<gt>connect()> 
+after it has been turned into a hash.  For instance, 
+C<-E<gt>connect('DATABASE', 'USERNAME')> will result in 
+C<$connect_args-E<gt>{dsn}> eq B<DATABASE> and C<$connect_args-E<gt>{user}> 
+eq B<USERNAME>.
 
 Additional parameters can be added by appending a hashref,
 to the connection call, as an example, C<-E<gt>connect( 'CONFIG', 
@@ -271,6 +275,12 @@ The function should return the same structure.  For instance:
 
 SymKat I<E<lt>symkat@symkat.comE<gt>>
 
+=head1 CONTRIBUTORS
+
+mst: Matt S. Trout <mst@shadowcatsystems.co.uk>
+
+ribasushi: Peter Rabbitson <ribasushi@cpan.org>
+
 =head1 COPYRIGHT AND LICENSE
 
 This is free software licensed under a I<BSD-Style> License.  Please see the 
@@ -278,7 +288,7 @@ LICENSE file included in this package for more detailed information.
 
 =head1 AVAILABILITY
 
-The latest version of this software is available at GitHub 
-https://github.com/symkat/DBIx-Class-Schema-Config
+The latest version of this software is available at
+L<https://github.com/symkat/DBIx-Class-Schema-Config>
 
 =cut

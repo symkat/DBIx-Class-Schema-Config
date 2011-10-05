@@ -16,7 +16,7 @@ ok $Schema1->storage->dbh->do( "CREATE TABLE hash ( key text, value text )" ),
 ok $Schema1->resultset('Hash')->create( { key => "Dr", value => "Spaceman" } ),
     "Can write to the Test Schema.";
 
-is $Schema1->resultset('Hash')->find( { key => 'Dr' } )->value, 'Spaceman',
+is $Schema1->resultset('Hash')->find( { key => 'Dr' }, { key => 'key_unique' } )->value, 'Spaceman',
     "Can read from the Test Schema.";
 
 # Pass through of array.
@@ -29,7 +29,7 @@ ok $Schema2->storage->dbh->do( "CREATE TABLE hash ( key text, value text )" ),
 ok $Schema2->resultset('Hash')->create( { key => "Dr", value => "Spaceman" } ),
     "Can write to the Test Schema.";
 
-is $Schema2->resultset('Hash')->find( { key => 'Dr' } )->value, 'Spaceman',
+is $Schema2->resultset('Hash')->find( { key => 'Dr' }, { key => 'key_unique' } )->value, 'Spaceman',
     "Can read from the Test Schema.";
     
 # Pass through of hash
@@ -42,7 +42,7 @@ ok $Schema3->storage->dbh->do( "CREATE TABLE hash ( key text, value text )" ),
 ok $Schema3->resultset('Hash')->create( { key => "Dr", value => "Spaceman" } ),
     "Can write to the Test Schema.";
 
-is $Schema3->resultset('Hash')->find( { key => 'Dr' } )->value, 'Spaceman',
+is $Schema3->resultset('Hash')->find( { key => 'Dr' }, { key => 'key_unique' } )->value, 'Spaceman',
     "Can read from the Test Schema.";
     
     
