@@ -1,5 +1,7 @@
+0.1.6
+    - Once more with feeling.
 0.1.5
-    - Re-release due to broken MANIFEST.skip and out README.pod
+    - Re-release due to broken MANIFEST.skip and outdated README.pod
 0.1.4 
     - Config::Any added as a requirement
     - Tests now use the included .perl format (No more YAML::XS requirement)
