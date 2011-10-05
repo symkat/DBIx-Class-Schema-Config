@@ -1,3 +1,25 @@
+0.1.5
+    - Re-release due to broken MANIFEST.skip and out README.pod
+0.1.4 
+    - Config::Any added as a requirement
+    - Tests now use the included .perl format (No more YAML::XS requirement)
+    - Tests changed to support DBIx::Class 0.80123
+    - Document Changes
+        - Linked to tutorial
+        - Added CONTRIBUTOR section
+            - Thanks mst and ribasushi for the constant reviews!
+    - Pushed to CPAN as a stable release
+0.1.3 
+    - connect() now handles passing through valid-looking DBI connect structures.
+    - _make_config now checks for $user and $pass to be hashrefs, this adds support
+      for structures like ->connect( 'CONFIG', { hostname => 'db.foo.com' } );
+    - Added tests to 01_*.t to ensure the new signatures work correctly.
+    - Updated tests in 06_*.t to use ->connect ('CONFIG', { dbname => ":memory:" )
+      to be more clear, as opposed to riding ->{user}
+    - Updated documentation to reflect the changes to the code, namely the hashref
+      as the second argument, and the statements referring to load_credentials having
+      responsibility to return normal DBI connect structures.
+    -  Config::Any is only loaded when it's needed.
 0.1.2
     - Makefile.PL depends on DBD::SQLite not DBD::SQLite3
     - _make_config has a less annoying return
