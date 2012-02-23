@@ -94,7 +94,7 @@ be found at L<http://www.symkat.com/credential-management-in-dbix-class>
 
     /etc/dbic.yaml
     MY_DATABASE:
-        dsn: "rbi:Pg:host=localhost;database=blog"
+        dsn: "dbi:Pg:host=localhost;database=blog"
         user: "TheDoctor"
         password: "dnoPydoleM"
         TraceLevel: 1
@@ -182,8 +182,8 @@ eq B<USERNAME>.
 
 Additional parameters can be added by appending a hashref,
 to the connection call, as an example, C<-E<gt>connect( 'CONFIG', 
-{ hostname =E<lt> "db.foo.com" } );> will give C<$connect_args> a 
-structure like C<{ dsn =E<lt> 'CONFIG', hostname =E<lt> "db.foo.com" }>.
+{ hostname =E<gt> "db.foo.com" } );> will give C<$connect_args> a
+structure like C<{ dsn =E<gt> 'CONFIG', hostname =E<gt> "db.foo.com" }>.
 
 For instance, if you want to use hostnames when you make the
 initial connection to DBIC and are using the configuration primarily
