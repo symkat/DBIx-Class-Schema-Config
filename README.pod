@@ -18,7 +18,7 @@ be found at L<http://www.symkat.com/credential-management-in-dbix-class>
 
     /etc/dbic.yaml
     MY_DATABASE:
-        dsn: "rbi:Pg:host=localhost;database=blog"
+        dsn: "dbi:Pg:host=localhost;database=blog"
         user: "TheDoctor"
         password: "dnoPydoleM"
         TraceLevel: 1
