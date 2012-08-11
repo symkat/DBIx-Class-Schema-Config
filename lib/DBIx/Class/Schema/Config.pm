@@ -3,6 +3,7 @@ use 5.005;
 use warnings;
 use strict;
 use base 'DBIx::Class::Schema';
+use File::HomeDir;
 
 our $VERSION = '0.001006'; # 0.1.6
 $VERSION = eval $VERSION;
@@ -70,7 +71,7 @@ sub load_credentials {
 sub filter_loaded_credentials { $_[1] };
 
 __PACKAGE__->mk_classaccessor('config_paths'); 
-__PACKAGE__->config_paths([('./dbic', $ENV{HOME} . '/.dbic', '/etc/dbic')]);
+__PACKAGE__->config_paths([('./dbic', File::HomeDir->my_home . '/.dbic', '/etc/dbic')]);
 
 1;
 

@@ -8,6 +8,7 @@ license         'bsd';
 # Specific dependencies
 requires       'DBIx::Class'            => '0.08100';
 requires       'Config::Any'            => '0.23';
+requires       'File::HomeDir'          => '0';
 
 test_requires  'Test::More'             => '0.42';
 test_requires  'DBD::SQLite'            => '0';
