@@ -5,7 +5,7 @@ use strict;
 use base 'DBIx::Class::Schema';
 use File::HomeDir;
 
-our $VERSION = '0.001006'; # 0.1.6
+our $VERSION = '0.001007'; # 0.1.7
 $VERSION = eval $VERSION;
 
 sub connection {
@@ -278,14 +278,20 @@ SymKat I<E<lt>symkat@symkat.comE<gt>>
 
 =head1 CONTRIBUTORS
 
-mst: Matt S. Trout <mst@shadowcatsystems.co.uk>
+=over 4
 
-ribasushi: Peter Rabbitson <ribasushi@cpan.org>
+=item * Matt S. Trout (mst) I<E<lt>mst@shadowcat.co.ukE<gt>> 
+
+=item * Peter Rabbitson (ribasushi) I<E<li>ribasushi@cpan.orgE<GT>>
+
+=item * Christian Walde I<E<lt>walde.christian@googlemail.comE<gt>>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This is free software licensed under a I<BSD-Style> License.  Please see the 
-LICENSE file included in this package for more detailed information.
+This library is free software and may be distributed under the same terms 
+as perl itself.
 
 =head1 AVAILABILITY
 

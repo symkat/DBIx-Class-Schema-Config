@@ -1,8 +1,8 @@
-=head1 NAME
+# NAME
 
 DBIx::Class::Schema::Config - Credential Management for DBIx::Class 
 
-=head1 DESCRIPTION
+# DESCRIPTION
 
 DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema 
 that allows the loading of credentials from a file.  The actual code 
@@ -12,9 +12,9 @@ credentials.
 
 A simple tutorial that compliments this documentation and explains converting 
 an existing DBIx::Class Schema to usingthis software to manage credentials can 
-be found at L<http://www.symkat.com/credential-management-in-dbix-class>
+be found at [http://www.symkat.com/credential-management-in-dbix-class](http://www.symkat.com/credential-management-in-dbix-class)
 
-=head1 SYNOPSIS
+# SYNOPSIS
 
     /etc/dbic.yaml
     MY_DATABASE:
@@ -37,31 +37,25 @@ be found at L<http://www.symkat.com/credential-management-in-dbix-class>
 
     my $schema = My::Schema->connect('MY_DATABASE');
 
-=head1 CONFIG FILES
+# CONFIG FILES
 
 This module will load the files in the following order if they exist:
 
-=over 4
+- ./dbic.\*
+- ~/.dbic.\*
+- /etc/dbic.\*
 
-=item * ./dbic.*
+The files should have an extension that [Config::Any](http://search.cpan.org/perldoc?Config::Any) recognizes, 
+for example /etc/dbic.__yaml__.
 
-=item * ~/.dbic.*
-
-=item * /etc/dbic.*
-
-=back
-
-The files should have an extension that L<Config::Any> recognizes, 
-for example /etc/dbic.B<yaml>.
-
-NOTE:  The first available credential will be used.  Therefore I<DATABASE> 
+NOTE:  The first available credential will be used.  Therefore _DATABASE_ 
 in ~/.dbic.yaml will only be looked at if it was not found in ./dbic.yaml.  
 If there are duplicates in one file (such that DATABASE is listed twice in 
 ~/.dbic.yaml,) the first configuration will be used.
 
-=head1 CHANGE CONFIG PATH
+# CHANGE CONFIG PATH
 
-Use C<__PACKAGE__-E<gt>config_paths([( '/file/stub', '/var/www/etc/dbic')]);> 
+Use `__PACKAGE__->config_paths([( '/file/stub', '/var/www/etc/dbic')]);` 
 to change the paths that are searched.  For example:
 
     package My::Schema
@@ -71,16 +65,16 @@ to change the paths that are searched.  For example:
     use base 'DBIx::Class::Schema::Config';
     __PACKAGE__->config_paths([( '/var/www/secret/dbic', '/opt/database' )]);
 
-The above code would have I</var/www/secret/dbic.*> and I</opt/database.*> 
+The above code would have _/var/www/secret/dbic.\*_ and _/opt/database.\*_ 
 searched, in that order.  As above, the first credentials found would be used.  
 This will replace the files origionally searched for, not add to them.
 
-=head1 OVERRIDING
+# OVERRIDING
 
 The API has been designed to be simple to override if you have additional 
 needs in loading DBIC configurations.
 
-=head2 filter_loaded_credentials
+## filter\_loaded\_credentials
 
 Override this function if you want to change the loaded credentials before
 they are passed to DBIC.  This is useful for use-cases that include decrypting
@@ -93,21 +87,21 @@ using it.
         return $loaded_credentials;
     }
 
-C<$loaded_credentials> is the structure after it has been loaded from the 
-configuration file.  In this case, C<$loaded_credentials-E<gt>{user}> eq 
-B<WalterWhite> and C<$loaded_credentials-E<gt>{dsn}> eq 
-B<DBI:mysql:database=students;host=%s;port=3306>.
+`$loaded_credentials` is the structure after it has been loaded from the 
+configuration file.  In this case, `$loaded_credentials->{user}` eq 
+__WalterWhite__ and `$loaded_credentials->{dsn}` eq 
+__DBI:mysql:database=students;host=%s;port=3306__.
 
-C<$connect_args> is the structure originally passed on C<-E<gt>connect()> 
+`$connect_args` is the structure originally passed on `->connect()` 
 after it has been turned into a hash.  For instance, 
-C<-E<gt>connect('DATABASE', 'USERNAME')> will result in 
-C<$connect_args-E<gt>{dsn}> eq B<DATABASE> and C<$connect_args-E<gt>{user}> 
-eq B<USERNAME>.
+`->connect('DATABASE', 'USERNAME')` will result in 
+`$connect_args->{dsn}` eq __DATABASE__ and `$connect_args->{user}` 
+eq __USERNAME__.
 
 Additional parameters can be added by appending a hashref,
-to the connection call, as an example, C<-E<gt>connect( 'CONFIG', 
-{ hostname =E<lt> "db.foo.com" } );> will give C<$connect_args> a 
-structure like C<{ dsn =E<lt> 'CONFIG', hostname =E<lt> "db.foo.com" }>.
+to the connection call, as an example, `->connect( 'CONFIG', 
+{ hostname => "db.foo.com" } );` will give `$connect_args` a
+structure like `{ dsn => 'CONFIG', hostname => "db.foo.com" }`.
 
 For instance, if you want to use hostnames when you make the
 initial connection to DBIC and are using the configuration primarily
@@ -134,23 +128,24 @@ In your Schema class, you could include the following:
         }
     }
     
+
     __PACKAGE__->load_classes;
     1;
 
 Then the connection could be done with 
-C<$Schema-E<gt>connect('DATABASE', { hostname => 'my.hostname.com' });>
+`$Schema->connect('DATABASE', { hostname =` 'my.hostname.com' });>
 
-See L</load_credentials> for more complex changes that require changing
+See ["load\_credentials"](#load\_credentials) for more complex changes that require changing
 how the configuration itself is loaded.
 
-=head2 load_credentials
+## load\_credentials
 
-Override this function to change the way that L<DBIx::Class::Schema::Config>
+Override this function to change the way that [DBIx::Class::Schema::Config](http://search.cpan.org/perldoc?DBIx::Class::Schema::Config)
 loads credentials.  The function takes the class name, as well as a hashref.
 
-If you take the route of having C<-E<gt>connect('DATABASE')> used as a key for 
-whatever configuration you are loading, I<DATABASE> would be 
-C<$config-E<gt>{dsn}>
+If you take the route of having `->connect('DATABASE')` used as a key for 
+whatever configuration you are loading, _DATABASE_ would be 
+`$config->{dsn}`
 
     Some::Schema->connect( 
         "SomeTarget", 
@@ -162,7 +157,7 @@ C<$config-E<gt>{dsn}>
     );
 
 Would result in the following data structure as $config in 
-C<load_credentials($class, $config)>:
+`load_credentials($class, $config)`:
 
     {
         dsn             => "SomeTarget",
@@ -171,12 +166,13 @@ C<load_credentials($class, $config)>:
         TraceLevel      => 1,
     }
 
-Currently, load_credentials will NOT be called if the first argument to
-C<-E<gt>connect()> looks like a valid DSN.  This is determined by match
-the DSN with C</^dbi:/i>.
+Currently, load\_credentials will NOT be called if the first argument to
+`->connect()` looks like a valid DSN.  This is determined by match
+the DSN with `/^dbi:/i`.
 
 The function should return the same structure.  For instance:
     
+
     package My::Schema
     use warnings;
     use strict;
@@ -193,25 +189,25 @@ The function should return the same structure.  For instance:
                 $config->{dsn}  ));
     }
     
+
     __PACKAGE__->load_classes;
 
-=head1 AUTHOR
+# AUTHOR
 
-SymKat I<E<lt>symkat@symkat.comE<gt>>
+SymKat _<symkat@symkat.com>_
 
-=head1 CONTRIBUTORS
+# CONTRIBUTORS
 
-mst: Matt S. Trout <mst@shadowcatsystems.co.uk>
+- Matt S. Trout (mst) \_<mst@shadowcat.co.uk>\_ 
+- Peter Rabbitson (ribasushi) \_&li;ribasushi@cpan.org&GT;\_
+- Christian Walde \_<walde.christian@googlemail.com>\_
 
-ribasushi: Peter Rabbitson <ribasushi@cpan.org>
+# COPYRIGHT AND LICENSE
 
-=head1 COPYRIGHT AND LICENSE
+This library is free software and may be distributed under the same terms 
+as perl itself.
 
-This is free software licensed under a I<BSD-Style> License.  Please see the 
-LICENSE file included in this package for more detailed information.
-
-=head1 AVAILABILITY
+# AVAILABILITY
 
 The latest version of this software is available at
-L<https://github.com/symkat/DBIx-Class-Schema-Config>
-
+[https://github.com/symkat/DBIx-Class-Schema-Config](https://github.com/symkat/DBIx-Class-Schema-Config)

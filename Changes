@@ -1,3 +1,9 @@
+0.1.7
+    - Use File::HomeDir instead of env, thanks @ Christian Walde
+    - CHANGELOG -> Changes
+    - BSD License -> Perl License
+    - README.pod -> Readme.md
+    - Contributor Addition (Christian Walde)
 0.1.6
     - Once more with feeling.
 0.1.5
