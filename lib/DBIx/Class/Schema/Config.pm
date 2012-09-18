@@ -79,13 +79,18 @@ sub _find_credentials {
     }
 }
 
+sub get_env_vars {
+    return $ENV{DBIX_CONFIG_DIR} . "/dbic" if exists $ENV{DBIX_CONFIG_DIR};
+    return ();
+}
+
 # Intended to be sub-classed, we'll just return the
 # credentials we used in the first place.
 sub filter_loaded_credentials { $_[1] };
 
 __PACKAGE__->mk_classaccessor('config_paths'); 
 __PACKAGE__->mk_classaccessor('config_files'); 
-__PACKAGE__->config_paths([('./dbic', File::HomeDir->my_home . '/.dbic', '/etc/dbic')]);
+__PACKAGE__->config_paths([( get_env_vars(), './dbic', File::HomeDir->my_home . '/.dbic', '/etc/dbic')]);
 __PACKAGE__->config_files([  ] );
 
 1;
@@ -134,6 +139,12 @@ be found at L<http://www.symkat.com/credential-management-in-dbix-class>
 This module will load the files in the following order if they exist:
 
 =over 4
+
+=item * C<$ENV{DBIX_CONFIG_DIR}> . '/dbic', 
+
+C<$ENV{DBIX_CONFIG_DIR}> can be configured at run-time, for instance:
+
+    DBIX_CONFIG_DIR="/var/local/" ./my_program.pl
 
 =item * ./dbic.*
 

@@ -3,6 +3,8 @@
       load_files method and reduce stat() calls for those who
       like that kind of thing.
     - Moved the Config::Any parser to its own private function.
+    - DBIX_CONFIG_DIR environment allows run-time injection of
+      a directory that contains a dbic.* file.
 0.1.7
     - Use File::HomeDir instead of env, thanks @ Christian Walde
     - CHANGELOG -> Changes
