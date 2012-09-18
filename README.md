@@ -41,6 +41,12 @@ be found at [http://www.symkat.com/credential-management-in-dbix-class](http://w
 
 This module will load the files in the following order if they exist:
 
+- \`$ENV{DBIX\_CONFIG\_DIR}\` . '/dbic', 
+
+`$ENV{DBIX_CONFIG_DIR}` can be configured at run-time, for instance:
+
+    DBIX_CONFIG_DIR="/var/local/" ./my_program.pl
+
 - ./dbic.\*
 - ~/.dbic.\*
 - /etc/dbic.\*
