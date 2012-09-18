@@ -1,3 +1,8 @@
+0.1.8
+    - Added class accessor config_files to use Config::Any's
+      load_files method and reduce stat() calls for those who
+      like that kind of thing.
+    - Moved the Config::Any parser to its own private function.
 0.1.7
     - Use File::HomeDir instead of env, thanks @ Christian Walde
     - CHANGELOG -> Changes
@@ -46,6 +51,5 @@
     - Move Config::Any into load_credentials to be lazy
     - Allow handling of a normal hashref, no ->{options} (Should make handling cleaner)
     - Add Testing schema for integration tests
-
 0.1.0:
     - Inital Version

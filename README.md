@@ -69,6 +69,27 @@ The above code would have _/var/www/secret/dbic.\*_ and _/opt/database.\*_
 searched, in that order.  As above, the first credentials found would be used.  
 This will replace the files origionally searched for, not add to them.
 
+# USE SPECIFIC CONFIG FILES
+
+If you would rather explicitly state the configuration files you
+want loaded, you can use the class accessor `config_files`
+instead.
+
+    package My::Schema
+    use warnings;
+    use strict;
+
+    use base 'DBIx::Class::Schema::Config';
+    __PACKAGE__->config_files([( '/var/www/secret/dbic.yaml', '/opt/database.yaml' )]);
+
+This will check the files, `/var/www/secret/dbic.yaml`, 
+and `/opt/database.yaml` in the same way as `config_paths`, 
+however it will only check the specific files, instead of checking 
+for each extension that [Config::Any](http://search.cpan.org/perldoc?Config::Any) supports.  You MUST use the 
+extension that corresponds to the file type you are loading.  
+See [Config::Any](http://search.cpan.org/perldoc?Config::Any) for information on supported file types and 
+extension mapping.
+
 # OVERRIDING
 
 The API has been designed to be simple to override if you have additional 
@@ -194,7 +215,7 @@ The function should return the same structure.  For instance:
 
 # AUTHOR
 
-SymKat _<symkat@symkat.com>_
+Kaitlyn Parkhurst (SymKat) _<symkat@symkat.com>_ ( Blog: [http://symkat.com/](http://symkat.com/) )
 
 # CONTRIBUTORS
 

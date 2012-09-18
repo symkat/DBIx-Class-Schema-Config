@@ -5,7 +5,7 @@ use strict;
 use base 'DBIx::Class::Schema';
 use File::HomeDir;
 
-our $VERSION = '0.001007'; # 0.1.7
+our $VERSION = '0.001008'; # 0.1.8
 $VERSION = eval $VERSION;
 
 sub connection {
@@ -48,18 +48,31 @@ sub load_credentials {
     # independently unit tested.
     return $connect_args if $connect_args->{dsn} =~ /^dbi:/i; 
 
-    my $ConfigAny = Config::Any->load_stems( 
-        { stems => $class->config_paths, use_ext => 1 } 
+    # If we have ->config_files, we'll use those and load_files
+    # instead of the default load_stems.
+    my %cf_opts = ( use_ext => 1 );
+    my $ConfigAny = @{$class->config_files}
+        ? Config::Any->load_files({ files => $class->config_files, %cf_opts })
+        : Config::Any->load_stems({ stems => $class->config_paths, %cf_opts });
+
+    return $class->filter_loaded_credentials(
+        $class->_find_credentials( $connect_args, $ConfigAny ),
+        $connect_args
     );
 
+}
+
+# This will look through the data structure returned by Config::Any
+# and return the first instance of the database credentials it can
+# find.
+sub _find_credentials {
+    my ( $class, $connect_args, $ConfigAny ) = @_;
+    
     for my $cfile ( @$ConfigAny ) {
         for my $filename ( keys %$cfile ) {
             for my $database ( keys %{$cfile->{$filename}} ) {
                 if ( $database eq $connect_args->{dsn} ) {
-                    my $loaded_credentials = $cfile->{$filename}->{$database};
-                    return $class->filter_loaded_credentials(
-                        $loaded_credentials,$connect_args
-                    );
+                    return $cfile->{$filename}->{$database};
                 }
             }
         }
@@ -71,7 +84,9 @@ sub load_credentials {
 sub filter_loaded_credentials { $_[1] };
 
 __PACKAGE__->mk_classaccessor('config_paths'); 
+__PACKAGE__->mk_classaccessor('config_files'); 
 __PACKAGE__->config_paths([('./dbic', File::HomeDir->my_home . '/.dbic', '/etc/dbic')]);
+__PACKAGE__->config_files([  ] );
 
 1;
 
@@ -151,6 +166,27 @@ to change the paths that are searched.  For example:
 The above code would have I</var/www/secret/dbic.*> and I</opt/database.*> 
 searched, in that order.  As above, the first credentials found would be used.  
 This will replace the files origionally searched for, not add to them.
+
+=head1 USE SPECIFIC CONFIG FILES
+
+If you would rather explicitly state the configuration files you
+want loaded, you can use the class accessor C<config_files>
+instead.
+
+    package My::Schema
+    use warnings;
+    use strict;
+
+    use base 'DBIx::Class::Schema::Config';
+    __PACKAGE__->config_files([( '/var/www/secret/dbic.yaml', '/opt/database.yaml' )]);
+
+This will check the files, C</var/www/secret/dbic.yaml>, 
+and C</opt/database.yaml> in the same way as C<config_paths>, 
+however it will only check the specific files, instead of checking 
+for each extension that L<Config::Any> supports.  You MUST use the 
+extension that corresponds to the file type you are loading.  
+See L<Config::Any> for information on supported file types and 
+extension mapping.
 
 =head1 OVERRIDING
 
@@ -274,7 +310,7 @@ The function should return the same structure.  For instance:
 
 =head1 AUTHOR
 
-SymKat I<E<lt>symkat@symkat.comE<gt>>
+Kaitlyn Parkhurst (SymKat) I<E<lt>symkat@symkat.comE<gt>> ( Blog: L<http://symkat.com/> )
 
 =head1 CONTRIBUTORS
 
