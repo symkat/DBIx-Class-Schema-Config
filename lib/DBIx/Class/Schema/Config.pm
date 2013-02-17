@@ -95,6 +95,8 @@ __PACKAGE__->config_files([  ] );
 
 1;
 
+=encoding UTF-8
+
 =head1 NAME
 
 DBIx::Class::Schema::Config - Credential Management for DBIx::Class 
@@ -329,11 +331,11 @@ Kaitlyn Parkhurst (SymKat) I<E<lt>symkat@symkat.comE<gt>> ( Blog: L<http://symka
 
 =item * Matt S. Trout (mst) I<E<lt>mst@shadowcat.co.ukE<gt>> 
 
-=item * Peter Rabbitson (ribasushi) I<E<li>ribasushi@cpan.orgE<GT>>
+=item * Peter Rabbitson (ribasushi) I<E<lt>ribasushi@cpan.orgE<gt>>
 
-=item * Christian Walde I<E<lt>walde.christian@googlemail.comE<gt>>
+=item * Christian Walde (Mihtaldu) I<E<lt>walde.christian@googlemail.comE<gt>>
 
-=item * Dagfinn Ilmari MannsÃ¥ker I<E<lt>ilmari@photobox.com<gt>>
+=item * Dagfinn Ilmari Mannsåker (ilmari) I<E<lt>ilmari@ilmari.orgE<gt>>
 
 =back
 
