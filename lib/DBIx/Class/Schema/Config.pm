@@ -5,7 +5,7 @@ use strict;
 use base 'DBIx::Class::Schema';
 use File::HomeDir;
 
-our $VERSION = '0.001008'; # 0.1.8
+our $VERSION = '0.001009'; # 0.1.9
 $VERSION = eval $VERSION;
 
 sub connection {
@@ -332,6 +332,8 @@ Kaitlyn Parkhurst (SymKat) I<E<lt>symkat@symkat.comE<gt>> ( Blog: L<http://symka
 =item * Peter Rabbitson (ribasushi) I<E<li>ribasushi@cpan.orgE<GT>>
 
 =item * Christian Walde I<E<lt>walde.christian@googlemail.comE<gt>>
+
+=item * Dagfinn Ilmari MannsÃ¥ker I<E<lt>ilmari@photobox.com<gt>>
 
 =back
 
