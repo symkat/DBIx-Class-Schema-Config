@@ -110,7 +110,7 @@ file. This aims to make it simpler for operations teams to manage database
 credentials.  
 
 A simple tutorial that compliments this documentation and explains converting 
-an existing DBIx::Class Schema to usingthis software to manage credentials can 
+an existing DBIx::Class Schema to use this software to manage credentials can 
 be found at L<http://www.symkat.com/credential-management-in-dbix-class>
 
 =head1 SYNOPSIS
@@ -178,7 +178,7 @@ to change the paths that are searched.  For example:
 
 The above code would have I</var/www/secret/dbic.*> and I</opt/database.*> 
 searched, in that order.  As above, the first credentials found would be used.  
-This will replace the files origionally searched for, not add to them.
+This will replace the files originally searched for, not add to them.
 
 =head1 USE SPECIFIC CONFIG FILES
 
@@ -210,7 +210,7 @@ needs in loading DBIC configurations.
 
 Override this function if you want to change the loaded credentials before
 they are passed to DBIC.  This is useful for use-cases that include decrypting
-encrypted passwords or making progamatic changes to the configuration before
+encrypted passwords or making programmatic changes to the configuration before
 using it.
 
     sub filter_loaded_credentials {
