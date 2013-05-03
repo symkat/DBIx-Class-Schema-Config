@@ -43,7 +43,7 @@ sub _make_connect_attrs {
 sub config {
     my ( $class ) = @_;
 
-    $class->_config ? $class->_config : $class->_config($class->_load_config);
+    $class->_config || $class->_load_config;
 }
 
 
