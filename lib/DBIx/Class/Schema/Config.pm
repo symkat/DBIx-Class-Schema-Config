@@ -39,14 +39,17 @@ sub _make_config {
     };
 }
 
-sub load_credentials {
-    my ( $class, $connect_args ) = @_;
-    require Config::Any; # Only loaded if we need to load credentials.
+# simple wrapped getter for lazyload
+sub config {
+    my ( $class ) = @_;
 
-    # While ->connect is responsible for returning normal-looking
-    # credential information, we do it here as well so that it can be
-    # independently unit tested.
-    return $connect_args if $connect_args->{dsn} =~ /^dbi:/i;
+    $class->_config ? $class->_config : $class->_config($class->_load_config);
+}
+
+
+sub _load_config {
+    my ( $class ) = @_;
+    require Config::Any; # Only loaded if we need to load credentials.
 
     # If we have ->config_files, we'll use those and load_files
     # instead of the default load_stems.
@@ -55,8 +58,20 @@ sub load_credentials {
         ? Config::Any->load_files({ files => $class->config_files, %cf_opts })
         : Config::Any->load_stems({ stems => $class->config_paths, %cf_opts });
 
+    # stuff the schema config for leveraging elsewhere in userland
+    $class->_config($ConfigAny);
+}
+
+
+sub load_credentials {
+    my ( $class, $connect_args ) = @_;
+    # While ->connect is responsible for returning normal-looking
+    # credential information, we do it here as well so that it can be
+    # independently unit tested.
+    return $connect_args if $connect_args->{dsn} =~ /^dbi:/i;
+
     return $class->filter_loaded_credentials(
-        $class->_find_credentials( $connect_args, $ConfigAny ),
+        $class->_find_credentials( $connect_args, $class->config ),
         $connect_args
     );
 
@@ -90,6 +105,7 @@ sub filter_loaded_credentials { $_[1] };
 
 __PACKAGE__->mk_classaccessor('config_paths');
 __PACKAGE__->mk_classaccessor('config_files');
+__PACKAGE__->mk_classaccessor('_config');
 __PACKAGE__->config_paths([( get_env_vars(), './dbic', File::HomeDir->my_home . '/.dbic', '/etc/dbic')]);
 __PACKAGE__->config_files([  ] );
 
@@ -103,11 +119,10 @@ DBIx::Class::Schema::Config - Credential Management for DBIx::Class
 
 =head1 DESCRIPTION
 
-DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema
-that allows the loading of credentials from a file.  The actual code
-itself would only need to know about the name used in the configuration
-file. This aims to make it simpler for operations teams to manage database
-credentials.
+DBIx::Class::Schema::Config is a subclass of DBIx::Class::Schema that allows
+the loading of credentials & configuration from a file.  The actual code itself
+would only need to know about the name used in the configuration file. This
+aims to make it simpler for operations teams to manage database credentials.
 
 A simple tutorial that compliments this documentation and explains converting
 an existing DBIx::Class Schema to usingthis software to manage credentials can
@@ -135,6 +150,9 @@ be found at L<http://www.symkat.com/credential-management-in-dbix-class>
     use My::Schema;
 
     my $schema = My::Schema->connect('MY_DATABASE');
+
+    # arbitrary config access from anywhere in your $app
+    my $level = My::Schema->config->{TraceLevel};
 
 =head1 CONFIG FILES
 
@@ -200,6 +218,23 @@ for each extension that L<Config::Any> supports.  You MUST use the
 extension that corresponds to the file type you are loading.
 See L<Config::Any> for information on supported file types and
 extension mapping.
+
+=head1 ACCESSING THE CONFIG FILE
+
+The config file is stored via the  C<__PACKAGE__-E<gt>config> accessor, which can be
+called as both a class and instance method:
+
+    package My::Schema
+    use warnings;
+    use strict;
+
+    use base 'DBIx::Class::Schema::Config';
+    __PACKAGE__->config_paths([( '/var/www/secret/dbic', '/opt/database' )]);
+
+The above code would have I</var/www/secret/dbic.*> and I</opt/database.*>
+searched, in that order.  As above, the first credentials found would be used.
+This will replace the files origionally searched for, not add to them.
+
 
 =head1 OVERRIDING
 
@@ -336,6 +371,8 @@ Kaitlyn Parkhurst (SymKat) I<E<lt>symkat@symkat.comE<gt>> ( Blog: L<http://symka
 =item * Christian Walde (Mihtaldu) I<E<lt>walde.christian@googlemail.comE<gt>>
 
 =item * Dagfinn Ilmari Mannsåker (ilmari) I<E<lt>ilmari@ilmari.orgE<gt>>
+
+=item * Matthew Phillips (mattp)  I<E<lt>mattp@cpan.orgE<gt>>
 
 =back
 
