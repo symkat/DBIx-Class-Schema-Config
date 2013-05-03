@@ -7,6 +7,26 @@ use lib 'lib';   # Tests inside t/
 use DBIx::Class::Schema::Config::Test;
 
 # Using a config file.
+my $expected_config = [
+    {
+        't/etc/config.perl' => {
+            'TEST' => {
+                'password' => '',
+                'dsn' => 'dbi:SQLite:dbname=:memory:',
+                'user' => ''
+            },
+            'PLUGIN' => {
+                'password' => '',
+                'dsn' => 'dbi:SQLite:dbname=%s',
+               'user' => ''
+            }
+        }
+    }
+];
+
+is_deeply(DBIx::Class::Schema::Config::Test->config, $expected_config, 
+    'config from class accessor matches as expected - loaded before connect');
+
 ok my $Schema1 = DBIx::Class::Schema::Config::Test->connect('TEST'),
     "Can connect to the Test Schema.";
 
