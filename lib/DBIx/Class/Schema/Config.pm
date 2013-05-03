@@ -11,14 +11,14 @@ $VERSION = eval $VERSION;
 sub connection {
     my ( $class, @info ) = @_;
 
-    my $config = $class->_make_config(@info);
+    my $attrs = $class->_make_connect_attrs(@info);
 
     # Take responsibility for passing through normal-looking
     # credentials.
-    $config = $class->load_credentials($config)
-        unless $config->{dsn} =~ /dbi:/i;
+    $attrs = $class->load_credentials($attrs)
+        unless $attrs->{dsn} =~ /dbi:/i;
 
-    return $class->next::method( $config );
+    return $class->next::method( $attrs );
 }
 
 # Normalize arguments into a single hash.  If we get a single hashref,
@@ -26,7 +26,7 @@ sub connection {
 # Check if $user and $pass are hashes to support things like
 # ->connect( 'CONFIG_FILE', { hostname => 'db.foo.com' } );
 
-sub _make_config {
+sub _make_connect_attrs {
     my ( $class, $dsn, $user, $pass, $dbi_attr, $extra_attr ) = @_;
     return $dsn if ref $dsn eq 'HASH';
 
