@@ -5,7 +5,7 @@ use strict;
 use base 'DBIx::Class::Schema';
 use File::HomeDir;
 
-our $VERSION = '0.001009'; # 0.1.9
+our $VERSION = '0.001010'; # 0.1.10
 $VERSION = eval $VERSION;
 
 sub connection {
