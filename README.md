@@ -143,9 +143,10 @@ The name of the connection to load from the configuration file is still given
 as the first argument, while the username and password follow and finally any 
 extra attributes you’d like to override.
 
-Please note that the username and password field must be set to undef if you 
-are not overriding them and wish to use extra attributes to override or add 
-additional configuration for the connection.
+If you are not using the username and password fields can you do not need to
+set them to undef, the following will work just as well:
+
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, { PrintError => 0 } );
 
 ## filter\_loaded\_credentials
 

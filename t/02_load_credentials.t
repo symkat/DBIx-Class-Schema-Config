@@ -126,6 +126,17 @@ my $tests = [
         title => "Override for non-replaced key works.",
     },
     {
+        put => [ 'OPTIONS', { TRACE_LEVEL => 10, MAGIC => 1 } ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'Happy',
+            password => 'User',
+            TRACE_LEVEL => 10,
+            MAGIC => 1,
+        },
+        title => "Override for non-replaced key works, without undefing",
+    },
+    {
         put => [ 'OPTIONS', "Foobar", undef, { TRACE_LEVEL => 10 } ],
         get => {
             dsn => 'dbi:SQLite:dbfile=:memory:',
@@ -134,6 +145,16 @@ my $tests = [
             TRACE_LEVEL => 10,
         },
         title => "Overriding the username works.",
+    },
+    {
+        put => [ 'OPTIONS', "Foobar", { TRACE_LEVEL => 10 } ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'Foobar',
+            password => 'User',
+            TRACE_LEVEL => 10,
+        },
+        title => "Overriding the username works without undefing password.",
     },
     {
         put => [ 'OPTIONS', undef, "Foobar", { TRACE_LEVEL => 10 } ],
