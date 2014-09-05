@@ -4,6 +4,8 @@ use warnings;
 use strict;
 use base 'DBIx::Class::Schema';
 use File::HomeDir;
+use Storable qw( dclone );
+
 
 our $VERSION = '0.001010'; # 0.1.10
 $VERSION = eval $VERSION;
@@ -32,10 +34,10 @@ sub _make_connect_attrs {
 
     return {
         dsn => $dsn,
-        %{ref $user eq 'HASH' ? $user : { user => $user }},
-        %{ref $pass eq 'HASH' ? $pass : { password => $pass }},
-        %{$dbi_attr || {} },
-        %{ $extra_attr || {} }
+        %{ ref $user eq 'HASH' ? $user : { user => $user } },
+        %{ ref $pass eq 'HASH' ? $pass : { password => $pass } },
+        %{ $dbi_attr || {} },
+        %{ $extra_attr || {} },
     };
 }
 
@@ -99,15 +101,44 @@ sub get_env_vars {
     return ();
 }
 
+sub _merge {
+    my ( $lhs, $rhs ) = ( dclone($_[0]), dclone($_[1]) );
+
+    if ( ref $lhs eq 'HASH' ) {
+        for my $key ( keys %$lhs ) {
+            if ( ref $lhs->{$key} eq 'HASH' ) {
+                $lhs->{$key} = _merge($lhs->{$key}, $rhs->{$key});
+                delete $rhs->{$key};
+            } else {
+                $lhs->{$key} = delete $rhs->{$key} if exists $rhs->{$key};
+            }
+        }
+        # Unhandled keys (simply do injection on uneven rhs structure)
+        for my $key ( keys %$rhs ) {
+            $lhs->{$key} = delete $rhs->{$key};
+        }
+    }
+
+    return $lhs;
+}
+
 # Intended to be sub-classed, we'll just return the
 # credentials we used in the first place.
-sub filter_loaded_credentials { $_[1] };
+sub filter_loaded_credentials { 
+    my ( $class, $new, $old ) = @_;
+
+    local $old->{password}, delete $old->{password} unless $old->{password};
+    local $old->{user},     delete $old->{user}     unless $old->{user};
+    local $old->{dsn},      delete $old->{dsn};
+    
+    return _merge( $new, $old );
+};
 
 __PACKAGE__->mk_classaccessor('config_paths');
 __PACKAGE__->mk_classaccessor('config_files');
 __PACKAGE__->mk_classaccessor('_config');
 __PACKAGE__->config_paths([( get_env_vars(), './dbic', File::HomeDir->my_home . '/.dbic', '/etc/dbic')]);
-__PACKAGE__->config_files([  ] );
+__PACKAGE__->config_files([  ]);
 
 1;
 
@@ -240,6 +271,35 @@ This will replace the files origionally searched for, not add to them.
 
 The API has been designed to be simple to override if you have additional
 needs in loading DBIC configurations.
+
+=head2 Overriding Connection Configuration
+
+Simple cases where one wants to replace specific configuration tokens can be
+given as extra parameters in the ->connect call.
+
+For example, suppose we have the database MY_DATABASE from above:
+
+    MY_DATABASE:
+        dsn: "dbi:Pg:host=localhost;database=blog"
+        user: "TheDoctor"
+        password: "dnoPydoleM"
+        TraceLevel: 1
+
+If you’d like to replace the username with “Eccleston” and we’d like to turn 
+PrintError off.
+
+The following connect line would achieve this:
+
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, undef, { PrintError => 0 } );
+
+The name of the connection to load from the configuration file is still given 
+as the first argument, while the username and password follow and finally any 
+extra attributes you’d like to override.
+
+If you are not using the username and password fields can you do not need to
+set them to undef, the following will work just as well:
+
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, { PrintError => 0 } );
 
 =head2 filter_loaded_credentials
 
