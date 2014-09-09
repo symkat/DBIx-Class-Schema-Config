@@ -16,17 +16,17 @@ use DBIx::Class::Schema::Config;
                     SOME_DATABASE => {
                         dsn => 'dbi:SQLite:dbfile=:memory:',
                         user => 'MyUser',
-                        pass => 'MyPass',
+                        password => 'MyPass',
                     },
                     AWESOME_DB => {
                         dsn => 'dbi:mysql:dbname=epsilon', 
                         user => 'Bravo',
-                        pass => 'ShiJulIanDav',
+                        password => 'ShiJulIanDav',
                     },
                     OPTIONS => {
                         dsn => 'dbi:SQLite:dbfile=:memory:',
                         user => 'Happy',
-                        pass => 'User',
+                        password => 'User',
                         TRACE_LEVEL => 5,
                     }
                 },
@@ -36,7 +36,7 @@ use DBIx::Class::Schema::Config;
                     SOME_DATABASE => {
                         dsn => 'dbi:mysql:dbname=acronym', 
                         user => 'YawnyPants',
-                        pass => 'WhyDoYouHateUs?',
+                        password => 'WhyDoYouHateUs?',
                     },
                 },
             }
@@ -50,7 +50,7 @@ my $tests = [
         get => {
                 dsn => 'dbi:SQLite:dbfile=:memory:',
                 user => 'MyUser',
-                pass => 'MyPass',
+                password => 'MyPass',
         },
         title => "Get DB info from hashref.",
     },
@@ -59,7 +59,7 @@ my $tests = [
         get => {
                 dsn  => 'dbi:SQLite:dbfile=:memory:',
                 user => 'MyUser',
-                pass => 'MyPass',
+                password => 'MyPass',
         },
         title => "Get DB info from array.",
     },
@@ -68,7 +68,7 @@ my $tests = [
         get => {
                 dsn  => 'dbi:mysql:dbname=epsilon', 
                 user => 'Bravo',
-                pass => 'ShiJulIanDav',
+                password => 'ShiJulIanDav',
         },
         title => "Get DB from hashref without user and pass.",
     },
@@ -99,7 +99,7 @@ my $tests = [
         get => {
             dsn => 'dbi:SQLite:dbfile=:memory:',
             user => 'Happy',
-            pass => 'User',
+            password => 'User',
             TRACE_LEVEL => 5,
         }
     }
