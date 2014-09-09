@@ -14,6 +14,10 @@ $VERSION = eval $VERSION;
 sub connection {
     my ( $class, @info ) = @_;
 
+    if ( ref($info[0]) eq 'CODE' ) {
+        return $class->next::method( @info );
+    }
+
     my $attrs = $class->_make_connect_attrs(@info);
 
     # Take responsibility for passing through normal-looking
@@ -265,8 +269,7 @@ The following connect line would achieve this:
 
 The name of the connection to load from the configuration file is still given 
 as the first argument, while other arguments may be given exactly as you would
-for any other call to C<connect> (with the exception of passing a coderef as
-the first argument).
+for any other call to C<connect>.
 
 Historical Note: This class accepts numerous ways to connect to DBIC that would
 otherwise not be valid.  These connection methods are discouraged but tested for
