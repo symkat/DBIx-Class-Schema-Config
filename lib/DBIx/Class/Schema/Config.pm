@@ -6,6 +6,7 @@ use base 'DBIx::Class::Schema';
 use File::HomeDir;
 use Storable qw( dclone );
 use Hash::Merge qw( merge );
+use namespace::clean;
 
 our $VERSION = '0.001010'; # 0.1.10
 $VERSION = eval $VERSION;
