@@ -100,9 +100,42 @@ sub get_env_vars {
     return ();
 }
 
-# Intended to be sub-classed, we'll just return the
-# credentials we used in the first place.
-sub filter_loaded_credentials { $_[1] };
+sub _merge {
+    my ( $lhs, $rhs ) = @_;
+
+    if ( ref $lhs eq 'HASH' ) {
+        for my $key ( keys %$lhs ) {
+            if ( ref $lhs->{$key} eq 'HASH' ) {
+                $lhs->{$key} = _merge($lhs->{$key}, $rhs->{$key});
+                delete $rhs->{$key};
+            } else {
+                $lhs->{$key} = delete $rhs->{$key} if exists $rhs->{$key};
+            }
+        }
+        # Unhandled keys (simply do injection on uneven rhs structure)
+        for my $key ( keys %$rhs ) {
+            $lhs->{$key} = delete $rhs->{$key};
+        }
+    }
+
+    return $lhs;
+}
+
+
+# Intended to be sub-classed, the default behavior is to
+# overwrite the loaded configuration with any specified
+# configuration from the connect() call, with the exception
+# of the DSN itself.
+
+sub filter_loaded_credentials {
+    my ( $class, $new, $old ) = @_;
+
+    local $old->{password}, delete $old->{password} unless $old->{password};
+    local $old->{user},     delete $old->{user}     unless $old->{user};
+    local $old->{dsn},      delete $old->{dsn};
+
+    return _merge( $new, $old );
+};
 
 __PACKAGE__->mk_classaccessor('config_paths');
 __PACKAGE__->mk_classaccessor('config_files');

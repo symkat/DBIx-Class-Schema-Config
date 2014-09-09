@@ -101,10 +101,81 @@ my $tests = [
             user => 'Happy',
             password => 'User',
             TRACE_LEVEL => 5,
-        }
-    }
-
-
+        },
+        title => "Default loading",
+    },
+    {
+        put => [ 'OPTIONS', undef, undef, { TRACE_LEVEL => 10 } ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'Happy',
+            password => 'User',
+            TRACE_LEVEL => 10,
+        },
+        title => "Override of replaced key works.",
+    },
+    {
+        put => [ 'OPTIONS', undef, undef, { TRACE_LEVEL => 10, MAGIC => 1 } ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'Happy',
+            password => 'User',
+            TRACE_LEVEL => 10,
+            MAGIC => 1,
+        },
+        title => "Override for non-replaced key works.",
+    },
+    {
+        put => [ 'OPTIONS', { TRACE_LEVEL => 10, MAGIC => 1 } ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'Happy',
+            password => 'User',
+            TRACE_LEVEL => 10,
+            MAGIC => 1,
+        },
+        title => "Override for non-replaced key works, without undefing",
+    },
+    {
+        put => [ 'OPTIONS', "Foobar", undef, { TRACE_LEVEL => 10 } ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'Foobar',
+            password => 'User',
+            TRACE_LEVEL => 10,
+        },
+        title => "Overriding the username works.",
+    },
+    {
+        put => [ 'OPTIONS', "Foobar", { TRACE_LEVEL => 10 } ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'Foobar',
+            password => 'User',
+            TRACE_LEVEL => 10,
+        },
+        title => "Overriding the username works without undefing password.",
+    },
+    {
+        put => [ 'OPTIONS', undef, "Foobar", { TRACE_LEVEL => 10 } ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'Happy',
+            password => 'Foobar',
+            TRACE_LEVEL => 10,
+        },
+        title => "Overriding the password works.",
+    },
+    {
+        put => [ 'OPTIONS', "BleeBaz", "Foobar", { TRACE_LEVEL => 10 } ],
+        get => {
+            dsn => 'dbi:SQLite:dbfile=:memory:',
+            user => 'BleeBaz',
+            password => 'Foobar',
+            TRACE_LEVEL => 10,
+        },
+        title => "Overriding the user and password works.",
+    }, 
 ];
 
 for my $test ( @$tests ) {
