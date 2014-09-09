@@ -1,4 +1,12 @@
 
+    - Using dbh_maker in a hash to connect() will not result
+      in connect() passing through your arguments after merging
+      into a single hash.
+    - Using a code ref for the first argument will now result
+      in connect() passing through your arguments as-is.
+    - README.pod symlink replaces pod2markdown use (YAY!)
+    - namespace::clean used to prevent methods from leaking
+    - Merge functionality replaced with Hash::Merge
     - Additional attributes passed to connect() will now overwrite
       the loaded configuration file.
     - Removed Test::MockObject as a dependency
