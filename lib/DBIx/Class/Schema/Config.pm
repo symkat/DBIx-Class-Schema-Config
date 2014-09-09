@@ -4,6 +4,7 @@ use warnings;
 use strict;
 use base 'DBIx::Class::Schema';
 use File::HomeDir;
+use Storable qw( dclone );
 
 our $VERSION = '0.001010'; # 0.1.10
 $VERSION = eval $VERSION;
@@ -39,11 +40,14 @@ sub _make_connect_attrs {
     };
 }
 
-# simple wrapped getter for lazyload
+# Cache the loaded configuration.
 sub config {
     my ( $class ) = @_;
 
-    $class->_config || $class->_load_config;
+    if ( ! $class->_config ) {
+        $class->_config( $class->_load_config );
+    } 
+    return dclone( $class->_config );
 }
 
 
@@ -54,12 +58,9 @@ sub _load_config {
     # If we have ->config_files, we'll use those and load_files
     # instead of the default load_stems.
     my %cf_opts = ( use_ext => 1 );
-    my $ConfigAny = @{$class->config_files}
+    return @{$class->config_files}
         ? Config::Any->load_files({ files => $class->config_files, %cf_opts })
         : Config::Any->load_stems({ stems => $class->config_paths, %cf_opts });
-
-    # stuff the schema config for leveraging elsewhere in userland
-    $class->_config($ConfigAny);
 }
 
 
