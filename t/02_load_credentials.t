@@ -2,12 +2,14 @@
 use warnings;
 use strict;
 use Test::More;
-use Test::MockObject;
 use DBIx::Class::Schema::Config;
 
-Test::MockObject->fake_module(
-    'Config::Any',
-    'load_stems' => sub {
+{
+    package Config::Any;
+
+    $INC{"Config/Any.pm"} = __FILE__;
+    
+    sub load_stems {
         return [
             {
                 'some_file' => { 
@@ -40,7 +42,7 @@ Test::MockObject->fake_module(
             }
         ]
     }
-);
+}
 
 my $tests = [
     {
