@@ -261,16 +261,11 @@ PrintError off.
 
 The following connect line would achieve this:
 
-    $Schema->connect(“MY_DATABASE”, “Eccleston”, undef, { PrintError => 0 } );
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, { PrintError => 0 } );
 
 The name of the connection to load from the configuration file is still given 
-as the first argument, while the username and password follow and finally any 
-extra attributes you’d like to override.
-
-If you are not using the username and password fields can you do not need to
-set them to undef, the following will work just as well:
-
-    $Schema->connect(“MY_DATABASE”, “Eccleston”, { PrintError => 0 } );
+as the first argument, while other arguments may be given exactly as you would
+for any other call to C<connect>.
 
 =head2 filter_loaded_credentials
 
