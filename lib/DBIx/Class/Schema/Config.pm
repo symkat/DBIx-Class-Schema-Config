@@ -20,6 +20,11 @@ sub connection {
 
     my $attrs = $class->_make_connect_attrs(@info);
 
+    # We will not load credentials for someone who uses dbh_maker,
+    # however we will pass their request through.
+    return $class->next::method( $attrs )
+        if defined $attrs->{dbh_maker};
+
     # Take responsibility for passing through normal-looking
     # credentials.
     $attrs = $class->load_credentials($attrs)
@@ -72,6 +77,7 @@ sub _load_config {
 
 sub load_credentials {
     my ( $class, $connect_args ) = @_;
+
     # While ->connect is responsible for returning normal-looking
     # credential information, we do it here as well so that it can be
     # independently unit tested.
