@@ -256,24 +256,41 @@ extension mapping.
 =head1 ACCESSING THE CONFIG FILE
 
 The config file is stored via the  C<__PACKAGE__-E<gt>config> accessor, which can be
-called as both a class and instance method:
-
-    package My::Schema
-    use warnings;
-    use strict;
-
-    use base 'DBIx::Class::Schema::Config';
-    __PACKAGE__->config_paths([( '/var/www/secret/dbic', '/opt/database' )]);
-
-The above code would have I</var/www/secret/dbic.*> and I</opt/database.*>
-searched, in that order.  As above, the first credentials found would be used.
-This will replace the files origionally searched for, not add to them.
-
+called as both a class and instance method.
 
 =head1 OVERRIDING
 
 The API has been designed to be simple to override if you have additional
 needs in loading DBIC configurations.
+
+=head2 Overriding Connection Configuration
+
+Simple cases where one wants to replace specific configuration tokens can be
+given as extra parameters in the ->connect call.
+
+For example, suppose we have the database MY_DATABASE from above:
+
+    MY_DATABASE:
+        dsn: "dbi:Pg:host=localhost;database=blog"
+        user: "TheDoctor"
+        password: "dnoPydoleM"
+        TraceLevel: 1
+
+If you’d like to replace the username with “Eccleston” and we’d like to turn 
+PrintError off.
+
+The following connect line would achieve this:
+
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, undef, { PrintError => 0 } );
+
+The name of the connection to load from the configuration file is still given 
+as the first argument, while the username and password follow and finally any 
+extra attributes you’d like to override.
+
+If you are not using the username and password fields can you do not need to
+set them to undef, the following will work just as well:
+
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, { PrintError => 0 } );
 
 =head2 filter_loaded_credentials
 
