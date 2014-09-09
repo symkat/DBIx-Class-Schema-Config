@@ -53,8 +53,8 @@ This module will load the files in the following order if they exist:
 - ~/.dbic.\*
 - /etc/dbic.\*
 
-The files should have an extension that [Config::Any](http://search.cpan.org/perldoc?Config::Any) recognizes,
-for example /etc/dbic.__yaml__.
+The files should have an extension that [Config::Any](https://metacpan.org/pod/Config::Any) recognizes,
+for example /etc/dbic.**yaml**.
 
 NOTE:  The first available credential will be used.  Therefore _DATABASE_
 in ~/.dbic.yaml will only be looked at if it was not found in ./dbic.yaml.
@@ -93,33 +93,49 @@ instead.
 This will check the files, `/var/www/secret/dbic.yaml`,
 and `/opt/database.yaml` in the same way as `config_paths`,
 however it will only check the specific files, instead of checking
-for each extension that [Config::Any](http://search.cpan.org/perldoc?Config::Any) supports.  You MUST use the
+for each extension that [Config::Any](https://metacpan.org/pod/Config::Any) supports.  You MUST use the
 extension that corresponds to the file type you are loading.
-See [Config::Any](http://search.cpan.org/perldoc?Config::Any) for information on supported file types and
+See [Config::Any](https://metacpan.org/pod/Config::Any) for information on supported file types and
 extension mapping.
 
 # ACCESSING THE CONFIG FILE
 
 The config file is stored via the  `__PACKAGE__->config` accessor, which can be
-called as both a class and instance method:
-
-    package My::Schema
-    use warnings;
-    use strict;
-
-    use base 'DBIx::Class::Schema::Config';
-    __PACKAGE__->config_paths([( '/var/www/secret/dbic', '/opt/database' )]);
-
-The above code would have _/var/www/secret/dbic.\*_ and _/opt/database.\*_
-searched, in that order.  As above, the first credentials found would be used.
-This will replace the files origionally searched for, not add to them.
-
-
+called as both a class and instance method.
 
 # OVERRIDING
 
 The API has been designed to be simple to override if you have additional
 needs in loading DBIC configurations.
+
+## Overriding Connection Configuration
+
+Simple cases where one wants to replace specific configuration tokens can be
+given as extra parameters in the ->connect call.
+
+For example, suppose we have the database MY\_DATABASE from above:
+
+    MY_DATABASE:
+        dsn: "dbi:Pg:host=localhost;database=blog"
+        user: "TheDoctor"
+        password: "dnoPydoleM"
+        TraceLevel: 1
+
+If you’d like to replace the username with “Eccleston” and we’d like to turn 
+PrintError off.
+
+The following connect line would achieve this:
+
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, undef, { PrintError => 0 } );
+
+The name of the connection to load from the configuration file is still given 
+as the first argument, while the username and password follow and finally any 
+extra attributes you’d like to override.
+
+If you are not using the username and password fields can you do not need to
+set them to undef, the following will work just as well:
+
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, { PrintError => 0 } );
 
 ## filter\_loaded\_credentials
 
@@ -136,14 +152,14 @@ using it.
 
 `$loaded_credentials` is the structure after it has been loaded from the
 configuration file.  In this case, `$loaded_credentials->{user}` eq
-__WalterWhite__ and `$loaded_credentials->{dsn}` eq
-__DBI:mysql:database=students;host=%s;port=3306__.
+**WalterWhite** and `$loaded_credentials->{dsn}` eq
+**DBI:mysql:database=students;host=%s;port=3306**.
 
 `$connect_args` is the structure originally passed on `->connect()`
 after it has been turned into a hash.  For instance,
 `->connect('DATABASE', 'USERNAME')` will result in
-`$connect_args->{dsn}` eq __DATABASE__ and `$connect_args->{user}`
-eq __USERNAME__.
+`$connect_args->{dsn}` eq **DATABASE** and `$connect_args->{user}`
+eq **USERNAME**.
 
 Additional parameters can be added by appending a hashref,
 to the connection call, as an example, `->connect( 'CONFIG',
@@ -181,12 +197,12 @@ In your Schema class, you could include the following:
 Then the connection could be done with
 `$Schema->connect('DATABASE', { hostname =` 'my.hostname.com' });>
 
-See ["load\_credentials"](#load\_credentials) for more complex changes that require changing
+See ["load\_credentials"](#load_credentials) for more complex changes that require changing
 how the configuration itself is loaded.
 
 ## load\_credentials
 
-Override this function to change the way that [DBIx::Class::Schema::Config](http://search.cpan.org/perldoc?DBIx::Class::Schema::Config)
+Override this function to change the way that [DBIx::Class::Schema::Config](https://metacpan.org/pod/DBIx::Class::Schema::Config)
 loads credentials.  The function takes the class name, as well as a hashref.
 
 If you take the route of having `->connect('DATABASE')` used as a key for
