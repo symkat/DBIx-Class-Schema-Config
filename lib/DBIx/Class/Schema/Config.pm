@@ -5,6 +5,7 @@ use strict;
 use base 'DBIx::Class::Schema';
 use File::HomeDir;
 use Storable qw( dclone );
+use Hash::Merge qw( merge );
 
 our $VERSION = '0.001010'; # 0.1.10
 $VERSION = eval $VERSION;
@@ -100,28 +101,6 @@ sub get_env_vars {
     return ();
 }
 
-sub _merge {
-    my ( $lhs, $rhs ) = @_;
-
-    if ( ref $lhs eq 'HASH' ) {
-        for my $key ( keys %$lhs ) {
-            if ( ref $lhs->{$key} eq 'HASH' ) {
-                $lhs->{$key} = _merge($lhs->{$key}, $rhs->{$key});
-                delete $rhs->{$key};
-            } else {
-                $lhs->{$key} = delete $rhs->{$key} if exists $rhs->{$key};
-            }
-        }
-        # Unhandled keys (simply do injection on uneven rhs structure)
-        for my $key ( keys %$rhs ) {
-            $lhs->{$key} = delete $rhs->{$key};
-        }
-    }
-
-    return $lhs;
-}
-
-
 # Intended to be sub-classed, the default behavior is to
 # overwrite the loaded configuration with any specified
 # configuration from the connect() call, with the exception
@@ -134,7 +113,7 @@ sub filter_loaded_credentials {
     local $old->{user},     delete $old->{user}     unless $old->{user};
     local $old->{dsn},      delete $old->{dsn};
 
-    return _merge( $new, $old );
+    return merge( $old, $new );
 };
 
 __PACKAGE__->mk_classaccessor('config_paths');

@@ -6,6 +6,7 @@ use Test::More;
 my @want_modules = qw/
     DBI
     DBIx::Class
+    Hash::Merge
     DBIx::Class::Schema
     DBIx::Class::Schema::Config
 /;
