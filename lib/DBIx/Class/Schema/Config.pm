@@ -261,11 +261,17 @@ PrintError off.
 
 The following connect line would achieve this:
 
-    $Schema->connect(“MY_DATABASE”, “Eccleston”, { PrintError => 0 } );
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, undef, { PrintError => 0 } );
 
 The name of the connection to load from the configuration file is still given 
 as the first argument, while other arguments may be given exactly as you would
-for any other call to C<connect>.
+for any other call to C<connect> (with the exception of passing a coderef as
+the first argument).
+
+Historical Note: This class accepts numerous ways to connect to DBIC that would
+otherwise not be valid.  These connection methods are discouraged but tested for
+and kept for compatibility with earlier versions.  For valid ways of connecting to DBIC
+please see L<https://metacpan.org/pod/DBIx::Class::Storage::DBI#connect_info>
 
 =head2 filter_loaded_credentials
 
