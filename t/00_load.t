@@ -6,7 +6,8 @@ use Test::More;
 my @want_modules = qw/
     DBI
     DBIx::Class
-    Test::MockObject
+    Hash::Merge
+    namespace::clean
     DBIx::Class::Schema
     DBIx::Class::Schema::Config
 /;

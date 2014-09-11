@@ -4,14 +4,26 @@ use warnings;
 use strict;
 use base 'DBIx::Class::Schema';
 use File::HomeDir;
+use Storable qw( dclone );
+use Hash::Merge qw( merge );
+use namespace::clean;
 
-our $VERSION = '0.001010'; # 0.1.10
+our $VERSION = '0.001011'; # 0.1.11
 $VERSION = eval $VERSION;
 
 sub connection {
     my ( $class, @info ) = @_;
 
+    if ( ref($info[0]) eq 'CODE' ) {
+        return $class->next::method( @info );
+    }
+
     my $attrs = $class->_make_connect_attrs(@info);
+
+    # We will not load credentials for someone who uses dbh_maker,
+    # however we will pass their request through.
+    return $class->next::method( $attrs )
+        if defined $attrs->{dbh_maker};
 
     # Take responsibility for passing through normal-looking
     # credentials.
@@ -39,11 +51,14 @@ sub _make_connect_attrs {
     };
 }
 
-# simple wrapped getter for lazyload
+# Cache the loaded configuration.
 sub config {
     my ( $class ) = @_;
 
-    $class->_config || $class->_load_config;
+    if ( ! $class->_config ) {
+        $class->_config( $class->_load_config );
+    } 
+    return dclone( $class->_config );
 }
 
 
@@ -54,17 +69,15 @@ sub _load_config {
     # If we have ->config_files, we'll use those and load_files
     # instead of the default load_stems.
     my %cf_opts = ( use_ext => 1 );
-    my $ConfigAny = @{$class->config_files}
+    return @{$class->config_files}
         ? Config::Any->load_files({ files => $class->config_files, %cf_opts })
         : Config::Any->load_stems({ stems => $class->config_paths, %cf_opts });
-
-    # stuff the schema config for leveraging elsewhere in userland
-    $class->_config($ConfigAny);
 }
 
 
 sub load_credentials {
     my ( $class, $connect_args ) = @_;
+
     # While ->connect is responsible for returning normal-looking
     # credential information, we do it here as well so that it can be
     # independently unit tested.
@@ -99,9 +112,20 @@ sub get_env_vars {
     return ();
 }
 
-# Intended to be sub-classed, we'll just return the
-# credentials we used in the first place.
-sub filter_loaded_credentials { $_[1] };
+# Intended to be sub-classed, the default behavior is to
+# overwrite the loaded configuration with any specified
+# configuration from the connect() call, with the exception
+# of the DSN itself.
+
+sub filter_loaded_credentials {
+    my ( $class, $new, $old ) = @_;
+
+    local $old->{password}, delete $old->{password} unless $old->{password};
+    local $old->{user},     delete $old->{user}     unless $old->{user};
+    local $old->{dsn},      delete $old->{dsn};
+
+    return merge( $old, $new );
+};
 
 __PACKAGE__->mk_classaccessor('config_paths');
 __PACKAGE__->mk_classaccessor('config_files');
@@ -222,24 +246,41 @@ extension mapping.
 =head1 ACCESSING THE CONFIG FILE
 
 The config file is stored via the  C<__PACKAGE__-E<gt>config> accessor, which can be
-called as both a class and instance method:
-
-    package My::Schema
-    use warnings;
-    use strict;
-
-    use base 'DBIx::Class::Schema::Config';
-    __PACKAGE__->config_paths([( '/var/www/secret/dbic', '/opt/database' )]);
-
-The above code would have I</var/www/secret/dbic.*> and I</opt/database.*>
-searched, in that order.  As above, the first credentials found would be used.
-This will replace the files origionally searched for, not add to them.
-
+called as both a class and instance method.
 
 =head1 OVERRIDING
 
 The API has been designed to be simple to override if you have additional
 needs in loading DBIC configurations.
+
+=head2 Overriding Connection Configuration
+
+Simple cases where one wants to replace specific configuration tokens can be
+given as extra parameters in the ->connect call.
+
+For example, suppose we have the database MY_DATABASE from above:
+
+    MY_DATABASE:
+        dsn: "dbi:Pg:host=localhost;database=blog"
+        user: "TheDoctor"
+        password: "dnoPydoleM"
+        TraceLevel: 1
+
+If you’d like to replace the username with “Eccleston” and we’d like to turn 
+PrintError off.
+
+The following connect line would achieve this:
+
+    $Schema->connect(“MY_DATABASE”, “Eccleston”, undef, { PrintError => 0 } );
+
+The name of the connection to load from the configuration file is still given 
+as the first argument, while other arguments may be given exactly as you would
+for any other call to C<connect>.
+
+Historical Note: This class accepts numerous ways to connect to DBIC that would
+otherwise not be valid.  These connection methods are discouraged but tested for
+and kept for compatibility with earlier versions.  For valid ways of connecting to DBIC
+please see L<https://metacpan.org/pod/DBIx::Class::Storage::DBI#connect_info>
 
 =head2 filter_loaded_credentials
 

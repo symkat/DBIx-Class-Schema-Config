@@ -66,7 +66,35 @@ is $Schema3->resultset('Hash')->find( { key => 'Dr' }, { key => 'key_unique' } )
     "Can read from the Test Schema.";
     
     
+# Pass through of code reference.
+ok my $Schema4 = DBIx::Class::Schema::Config::Test->connect(
+        sub { DBI->connect( 'dbi:SQLite:dbname=:memory:', undef, undef, { RaiseError => 1 } ) } 
+    ), "Can connect to the Test Schema.";
+
+ok $Schema4->storage->dbh->do( "CREATE TABLE hash ( key text, value text )" ),
+    "Can create table against the raw dbh.";
+
+ok $Schema4->resultset('Hash')->create( { key => "Dr", value => "Spaceman" } ),
+    "Can write to the Test Schema.";
+
+is $Schema4->resultset('Hash')->find( { key => 'Dr' }, { key => 'key_unique' } )->value, 'Spaceman',
+    "Can read from the Test Schema.";
     
+# dbh_maker functions as one would expect.
+ok my $Schema5 = DBIx::Class::Schema::Config::Test->connect({
+        dbh_maker => sub {
+            DBI->connect( 'dbi:SQLite:dbname=:memory:', undef, undef, { RaiseError => 1 } )
+        }, 
+    }), "Can connect to the Test Schema.";
+
+ok $Schema5->storage->dbh->do( "CREATE TABLE hash ( key text, value text )" ),
+    "Can create table against the raw dbh.";
+
+ok $Schema5->resultset('Hash')->create( { key => "Dr", value => "Spaceman" } ),
+    "Can write to the Test Schema.";
+
+is $Schema5->resultset('Hash')->find( { key => 'Dr' }, { key => 'key_unique' } )->value, 'Spaceman',
+    "Can read from the Test Schema.";
     
     
 done_testing;
