@@ -397,6 +397,19 @@ The function should return the same structure.  For instance:
 
     __PACKAGE__->load_classes;
 
+=head1 Using with Catalyst::Model::DBIC::Schema
+
+It is also possible to use connection settings with L<Catalyst::Model::DBIC::Schema>:
+
+    package My::Model::DB;
+    use Moose;
+    extends 'Catalyst::Model::DBIC::Schema';
+
+    __PACKAGE__->config(
+        schema_class => 'My::Schema',
+        connect_info => 'MY_DATABASE', # Calls My::Schema->connect('MY_DATABASE');
+    );
+
 =head1 AUTHOR
 
 Kaitlyn Parkhurst (SymKat) I<E<lt>symkat@symkat.comE<gt>> ( Blog: L<http://symkat.com/> )
