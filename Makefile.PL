@@ -18,4 +18,8 @@ test_requires  'Test::More'             => '0.42';
 test_requires  'DBD::SQLite'            => '0';
 test_requires  'Config::Any'            => '0.23';
 
+if ( !eval "use YAML::XS; 1" && !eval "use YAML::Syck 0.70; 1" ) {
+    test_requires 'YAML' => 0;
+}
+
 WriteAll;
