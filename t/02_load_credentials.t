@@ -176,6 +176,26 @@ my $tests = [
         },
         title => "Overriding the user and password works.",
     }, 
+
+    # Mojo-like postgresql connection lines.
+    {
+        put => [ 'postgresql://username:password@hostname:5433/minion' ],
+        get => {
+            dsn => 'dbi:Pg:dbname=minion;host=hostname;port=5433',
+            user => 'username',
+            password => 'password',
+        },
+        title => "Mojo-like postgresql:// connect line, with port.",
+    },
+    {
+        put => [ 'postgresql://username:password@hostname/minion' ],
+        get => {
+            dsn => 'dbi:Pg:dbname=minion;host=hostname',
+            user => 'username',
+            password => 'password',
+        },
+        title => "Mojo-like postgresql:// connect line.",
+    },
 ];
 
 for my $test ( @$tests ) {
