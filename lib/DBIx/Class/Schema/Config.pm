@@ -288,6 +288,12 @@ called as both a class and instance method.
 The API has been designed to be simple to override if you have additional
 needs in loading DBIC configurations.
 
+=head2 Mojo::Pg-Like Connection Strings
+
+Calls to connect with L<Mojo::Pg>-like URIs are supported.
+
+    my $schema = My::Schema->connect( 'postgresql://username:password@localhost/dbname' );
+
 =head2 Overriding Connection Configuration
 
 Simple cases where one wants to replace specific configuration tokens can be
