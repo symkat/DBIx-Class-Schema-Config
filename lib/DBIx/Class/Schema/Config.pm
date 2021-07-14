@@ -9,7 +9,7 @@ use Hash::Merge qw( merge );
 use namespace::clean;
 use URI;
 
-our $VERSION = '0.001013'; # 0.1.13
+our $VERSION = '0.001014'; # 0.1.14
 $VERSION = eval $VERSION;
 
 sub connection {

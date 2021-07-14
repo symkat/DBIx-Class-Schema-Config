@@ -1,5 +1,6 @@
 0.1.14:
     - Allow Mojo::Pg-like postgresql:// links for schema connect.
+    - Switch from Module::Install to Dist::Zilla.
 
 0.1.13:
     - Add '.' to @INC so Module::Install continues to work,
